@@ -1,5 +1,7 @@
 package br.com.monitoria.web.response;
 
+import br.com.monitoria.domain.Edital;
+
 import java.time.LocalDate;
 
 public class EditalResponse {
@@ -12,11 +14,11 @@ public class EditalResponse {
 
     private LocalDate fimInscricoes;
 
-    public EditalResponse(Long id, String semestre, LocalDate inicioInscricoes, LocalDate fimInscricoes) {
-        this.id = id;
-        this.semestre = semestre;
-        this.inicioInscricoes = inicioInscricoes;
-        this.fimInscricoes = fimInscricoes;
+    public EditalResponse(Edital edital) {
+        this.id = edital.getId();
+        this.semestre = edital.getSemestre();
+        this.inicioInscricoes = edital.getInicioInscricoes();
+        this.fimInscricoes = edital.getFimInscricoes();
     }
 
     public Long getId() {

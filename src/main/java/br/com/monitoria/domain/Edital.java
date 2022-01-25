@@ -24,6 +24,9 @@ public class Edital {
     @NotNull
     private LocalDate fimInscricoes;
 
+    public Edital() {
+    }
+
     public Edital(@NotBlank String semestre, @NotNull LocalDate inicioInscricoes, @NotNull LocalDate fimInscricoes) {
         this.semestre = semestre;
         this.inicioInscricoes = inicioInscricoes;
