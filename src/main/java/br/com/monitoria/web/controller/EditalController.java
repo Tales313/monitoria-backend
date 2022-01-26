@@ -1,6 +1,7 @@
 package br.com.monitoria.web.controller;
 
 import br.com.monitoria.domain.Edital;
+import br.com.monitoria.exception.DataInscricoesException;
 import br.com.monitoria.exception.NotFoundException;
 import br.com.monitoria.repository.EditalRepository;
 import br.com.monitoria.web.request.EditalRequest;
@@ -24,6 +25,9 @@ public class EditalController {
 
         Edital edital = request.toModel();
         edital = editalRepository.save(edital);
+
+        if(request.getInicioInscricoes().isAfter(request.getFimInscricoes()))
+            throw new DataInscricoesException("A data de início das inscrições deve ser antes da data de fim das incrições");
 
         return new EditalResponse(edital);
 
