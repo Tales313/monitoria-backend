@@ -29,7 +29,9 @@ public class Edital {
     public Edital() {
     }
 
-    public Edital(@NotBlank String semestre, @NotNull LocalDate inicioInscricoes, @NotNull LocalDate fimInscricoes) {
+    public Edital(@NotBlank(message = "O semestre não deve estar em branco") @Pattern(regexp = "^\\d{4}\\.\\d$", message = "O semestre deve ter o formato '2022.1'") String semestre,
+                  @NotNull(message = "A data de inicio das incrições deve ser informada") LocalDate inicioInscricoes,
+                  @NotNull(message = "A data de fim das inscrições deve ser informada") LocalDate fimInscricoes) {
         this.semestre = semestre;
         this.inicioInscricoes = inicioInscricoes;
         this.fimInscricoes = fimInscricoes;
