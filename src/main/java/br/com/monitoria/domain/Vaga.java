@@ -9,7 +9,7 @@ import javax.validation.constraints.Positive;
 public class Vaga {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "A disciplina deve ser informada")
@@ -25,6 +25,9 @@ public class Vaga {
     @NotNull(message = "Uma vaga deve pertencer a um edital")
     @ManyToOne
     private Edital edital;
+
+    public Vaga() {
+    }
 
     public Vaga(@NotBlank(message = "A disciplina deve ser informada") String disciplina,
                 @NotBlank(message = "O periodo deve ser informado") String periodo,

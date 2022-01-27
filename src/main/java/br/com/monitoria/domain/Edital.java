@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class Edital {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "O semestre não deve estar em branco")
