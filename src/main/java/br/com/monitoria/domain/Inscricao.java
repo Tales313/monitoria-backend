@@ -33,6 +33,7 @@ public class Inscricao {
     private Double media;
 
     @NotNull(message = "O resultado deve ser informado")
+    @Enumerated(EnumType.STRING)
     private ResultadoEnum resultado;
 
     @NotNull(message = "Uma inscrição deve ter uma vaga")
