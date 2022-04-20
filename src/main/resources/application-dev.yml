@@ -7,3 +7,10 @@ spring:
     url: "jdbc:postgresql://localhost:5432/monitoria"
     username: postgres
     password: 123
+
+aws:
+  sqs:
+    accessKey: AKIARDMBTIH6K7NY2HYY
+    secretKey: 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
+    queue:
+      url: https://sqs.us-east-1.amazonaws.com/075970593276/monitoria_emails.fifo
