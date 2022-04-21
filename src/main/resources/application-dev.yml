@@ -10,7 +10,7 @@ spring:
 
 aws:
   sqs:
-    accessKey: AKIARDMBTIH6K7NY2HYY
-    secretKey: 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
+    accessKey: ${ACCESS_KEY}
+    secretKey: ${SECRET_KEY}
     queue:
       url: https://sqs.us-east-1.amazonaws.com/075970593276/monitoria_emails.fifo
