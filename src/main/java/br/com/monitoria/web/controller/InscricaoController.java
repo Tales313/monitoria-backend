@@ -40,7 +40,7 @@ public class InscricaoController {
         Inscricao inscricao = request.toModel(vagaRepository, media);
         inscricao = inscricaoRepository.save(inscricao);
 
-        sqsService.enviarEmailDeInscricao(inscricao.getVaga().getDisciplina());
+//        sqsService.enviarEmailDeInscricao(inscricao.getVaga().getDisciplina());
 
         return new InscricaoResponse(inscricao);
 
