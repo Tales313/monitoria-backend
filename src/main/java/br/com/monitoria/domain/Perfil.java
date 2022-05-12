@@ -3,6 +3,7 @@ package br.com.monitoria.domain;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 @Entity
@@ -12,6 +13,7 @@ public class Perfil implements GrantedAuthority {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Um perfil precisa ter um nome")
     private String nome;
 
     @ManyToMany
