@@ -1,6 +1,7 @@
 package br.com.monitoria.web.request;
 
 import br.com.monitoria.domain.Edital;
+import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.domain.Vaga;
 import br.com.monitoria.exception.NotFoundException;
 import br.com.monitoria.repository.EditalRepository;
@@ -24,10 +25,10 @@ public class VagaRequest {
     @NotNull(message = "O id do edital deve ser informado")
     private Long editalId;
 
-    public Vaga toModel(EditalRepository editalRepository) {
+    public Vaga toModel(EditalRepository editalRepository, Usuario usuario) {
         Edital edital = editalRepository.findById(editalId).orElseThrow(
                 () -> new NotFoundException("Edital não encontrado"));
-        return new Vaga(disciplina, periodo, quantidade, edital);
+        return new Vaga(disciplina, periodo, quantidade, edital, usuario);
     }
 
     public String getDisciplina() {

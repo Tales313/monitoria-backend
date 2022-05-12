@@ -26,17 +26,23 @@ public class Vaga {
     @ManyToOne
     private Edital edital;
 
+    @NotNull(message = "Uma vaga deve ter sido cadastrado por um usuario")
+    @ManyToOne
+    private Usuario usuario;
+
     public Vaga() {
     }
 
     public Vaga(@NotBlank(message = "A disciplina deve ser informada") String disciplina,
                 @NotBlank(message = "O periodo deve ser informado") String periodo,
                 @NotNull(message = "A quantidade deve ser informada") @Positive(message = "A quantidade deve ter valor positivo") Integer quantidade,
-                @NotNull(message = "Uma vaga deve pertencer a um edital") Edital edital) {
+                @NotNull(message = "Uma vaga deve pertencer a um edital") Edital edital,
+                @NotNull(message = "Uma vaga deve ter sido cadastrado por um usuario") Usuario usuario) {
         this.disciplina = disciplina;
         this.periodo = periodo;
         this.quantidade = quantidade;
         this.edital = edital;
+        this.usuario = usuario;
     }
 
     public Long getId() {
