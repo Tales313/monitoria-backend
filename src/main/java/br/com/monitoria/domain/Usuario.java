@@ -28,7 +28,7 @@ public class Usuario implements UserDetails {
     @NotNull
     private LocalDateTime dataCadastro;
 
-    @ManyToMany(mappedBy = "usuarios")
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "usuarios")
     private Set<Perfil> perfis;
 
     public Usuario() {
