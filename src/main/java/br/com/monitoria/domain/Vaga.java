@@ -60,4 +60,12 @@ public class Vaga {
     public Integer getQuantidade() {
         return quantidade;
     }
+
+    public Edital getEdital() {
+        return edital;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
 }

@@ -18,8 +18,8 @@ public class Perfil implements GrantedAuthority {
 
     @ManyToMany
     @JoinTable(name = "usuarios_perfis",
-               joinColumns = @JoinColumn(name = "usuario_id"),
-               inverseJoinColumns = @JoinColumn(name = "perfil_id"))
+               joinColumns = @JoinColumn(name = "perfil_id"),
+               inverseJoinColumns = @JoinColumn(name = "usuario_id"))
     private Set<Usuario> usuarios;
 
     public Long getId() {

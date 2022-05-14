@@ -28,6 +28,9 @@ public class Usuario implements UserDetails {
     @NotNull
     private LocalDateTime dataCadastro;
 
+    @NotBlank
+    private String matricula;
+
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "usuarios")
     private Set<Perfil> perfis;
 
@@ -40,10 +43,11 @@ public class Usuario implements UserDetails {
      * @param login
      * @param senha deve entrar ja criptografada
      */
-    public Usuario(String login, String senha) {
+    public Usuario(String login, String senha, String matricula) {
         this.login = login;
         this.senha = senha;
         this.dataCadastro = LocalDateTime.now();
+        this.matricula = matricula;
     }
 
     public Long getId() {
@@ -60,6 +64,10 @@ public class Usuario implements UserDetails {
 
     public LocalDateTime getDataCadastro() {
         return dataCadastro;
+    }
+
+    public String getMatricula() {
+        return matricula;
     }
 
     @Override
