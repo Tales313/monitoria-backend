@@ -7,7 +7,6 @@ import br.com.monitoria.repository.VagaRepository;
 import br.com.monitoria.util.CalculaMedia;
 import br.com.monitoria.web.request.InscricaoRequest;
 import br.com.monitoria.web.response.InscricaoResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +17,17 @@ import javax.validation.Valid;
 @RequestMapping("/inscricoes")
 public class InscricaoController {
 
-    @Autowired
     private InscricaoRepository inscricaoRepository;
 
-    @Autowired
     private VagaRepository vagaRepository;
+
+    public InscricaoController(
+        InscricaoRepository inscricaoRepository,
+        VagaRepository vagaRepository
+    ) {
+        this.inscricaoRepository = inscricaoRepository;
+        this.vagaRepository = vagaRepository;
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

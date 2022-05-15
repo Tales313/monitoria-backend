@@ -6,7 +6,6 @@ import br.com.monitoria.repository.EditalRepository;
 import br.com.monitoria.repository.VagaRepository;
 import br.com.monitoria.web.request.VagaRequest;
 import br.com.monitoria.web.response.VagaResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +16,17 @@ import javax.validation.Valid;
 @RequestMapping("/vagas")
 public class VagaController {
 
-    @Autowired
     private VagaRepository vagaRepository;
 
-    @Autowired
     private EditalRepository editalRepository;
+
+    public VagaController(
+        VagaRepository vagaRepository,
+        EditalRepository editalRepository
+    ) {
+        this.vagaRepository = vagaRepository;
+        this.editalRepository = editalRepository;
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

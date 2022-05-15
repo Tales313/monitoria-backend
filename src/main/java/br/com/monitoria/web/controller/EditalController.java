@@ -7,7 +7,6 @@ import br.com.monitoria.exception.NotFoundException;
 import br.com.monitoria.repository.EditalRepository;
 import br.com.monitoria.web.request.EditalRequest;
 import br.com.monitoria.web.response.EditalResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +17,13 @@ import javax.validation.Valid;
 @RequestMapping("/editais")
 public class EditalController {
 
-    @Autowired
     private EditalRepository editalRepository;
+
+    public EditalController(
+            EditalRepository editalRepository
+    ) {
+        this.editalRepository = editalRepository;
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

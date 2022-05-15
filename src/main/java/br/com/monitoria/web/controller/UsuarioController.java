@@ -21,6 +21,14 @@ public class UsuarioController {
     @Autowired
     private HashService hashService;
 
+    public UsuarioController(
+        UsuarioRepository usuarioRepository,
+        HashService hashService
+    ) {
+        this.usuarioRepository = usuarioRepository;
+        this.hashService = hashService;
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UsuarioResponse cadastrarUsuario(@RequestBody @Valid UsuarioRequest request) {
