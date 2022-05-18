@@ -4,7 +4,6 @@ import br.com.monitoria.security.TokenService;
 import br.com.monitoria.util.HashService;
 import br.com.monitoria.web.request.LoginRequest;
 import br.com.monitoria.web.response.LoginResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,14 +21,21 @@ import javax.validation.Valid;
 @RequestMapping("/auth")
 public class AutenticacaoController {
 
-    @Autowired
     private AuthenticationManager authenticationManager;
 
-    @Autowired
     private TokenService tokenService;
 
-    @Autowired
     private HashService hashService;
+
+    public AutenticacaoController(
+            AuthenticationManager authenticationManager,
+            TokenService tokenService,
+            HashService hashService
+    ) {
+        this.authenticationManager = authenticationManager;
+        this.tokenService = tokenService;
+        this.hashService = hashService;
+    }
 
     @PostMapping
     @Transactional

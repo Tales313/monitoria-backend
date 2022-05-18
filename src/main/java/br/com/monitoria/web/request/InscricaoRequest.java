@@ -1,6 +1,7 @@
 package br.com.monitoria.web.request;
 
 import br.com.monitoria.domain.Inscricao;
+import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.domain.Vaga;
 import br.com.monitoria.exception.NotFoundException;
 import br.com.monitoria.repository.VagaRepository;
@@ -26,12 +27,12 @@ public class InscricaoRequest {
     @NotNull(message = "O id da vaga deve ser informado")
     private Long idVaga;
 
-    public Inscricao toModel(VagaRepository vagaRepository, Double media) {
+    public Inscricao toModel(VagaRepository vagaRepository, Double media, Usuario usuario) {
 
         Vaga vaga = vagaRepository.findById(idVaga).orElseThrow(
                 () -> new NotFoundException("Vaga não encontrada"));
 
-        return new Inscricao(opcao, notaDisciplina, cre, media, vaga);
+        return new Inscricao(opcao, notaDisciplina, cre, media, vaga, usuario);
     }
 
     public Integer getOpcao() {

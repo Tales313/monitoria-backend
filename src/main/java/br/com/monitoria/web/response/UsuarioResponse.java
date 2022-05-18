@@ -10,10 +10,13 @@ public class UsuarioResponse {
 
     private LocalDateTime dataCadastro;
 
-    public UsuarioResponse(String login, String senha, LocalDateTime dataCadastro) {
+    private String matricula;
+
+    public UsuarioResponse(String login, String senha, LocalDateTime dataCadastro, String matricula) {
         this.login = login;
         this.senha = senha;
         this.dataCadastro = dataCadastro;
+        this.matricula = matricula;
     }
 
     public String getLogin() {
@@ -28,4 +31,7 @@ public class UsuarioResponse {
         return dataCadastro;
     }
 
+    public String getMatricula() {
+        return matricula;
+    }
 }

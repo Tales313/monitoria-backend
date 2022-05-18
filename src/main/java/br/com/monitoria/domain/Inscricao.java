@@ -40,6 +40,10 @@ public class Inscricao {
     @ManyToOne
     private Vaga vaga;
 
+    @NotNull(message = "Uma inscrição pertence a um usuario")
+    @ManyToOne
+    private Usuario usuario;
+
     public Inscricao() {
     }
 
@@ -47,7 +51,8 @@ public class Inscricao {
                      @NotNull(message = "A nota da disciplina deve ser informada") @Positive(message = "A nota da disciplina deve ter valor positivo") Double notaDisciplina,
                      @NotNull(message = "O CRE deve ser informado") @Positive(message = "O CRE deve ter valor positivo") Double cre,
                      @NotNull(message = "A média deve ser informada") @Positive(message = "A média deve ter valor positivo") Double media,
-                     @NotNull(message = "Uma inscrição deve ter uma vaga") Vaga vaga) {
+                     @NotNull(message = "Uma inscrição deve ter uma vaga") Vaga vaga,
+                     @NotNull(message = "Uma inscrição pertence a um usuario") Usuario usuario) {
         this.dataInscricao = LocalDate.now();
         this.opcao = opcao;
         this.notaDisciplina = notaDisciplina;
@@ -55,6 +60,7 @@ public class Inscricao {
         this.media = media;
         this.resultado = ResultadoEnum.AGUARDANDO;
         this.vaga = vaga;
+        this.usuario = usuario;
     }
 
     public Long getId() {
@@ -87,5 +93,9 @@ public class Inscricao {
 
     public Vaga getVaga() {
         return vaga;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
     }
 }

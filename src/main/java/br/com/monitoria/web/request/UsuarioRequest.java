@@ -18,9 +18,13 @@ public class UsuarioRequest {
     @Size(min = 6)
     private String senha;
 
-    public UsuarioRequest(String login, String senha) {
+    @NotBlank
+    private String matricula;
+
+    public UsuarioRequest(String login, String senha, String matricula) {
         this.login = login;
         this.senha = senha;
+        this.matricula = matricula;
     }
 
     public String getLogin() {
@@ -29,5 +33,9 @@ public class UsuarioRequest {
 
     public String getSenha() {
         return senha;
+    }
+
+    public String getMatricula() {
+        return matricula;
     }
 }

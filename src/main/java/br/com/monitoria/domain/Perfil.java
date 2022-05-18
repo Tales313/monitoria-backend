@@ -3,6 +3,7 @@ package br.com.monitoria.domain;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 @Entity
@@ -12,12 +13,13 @@ public class Perfil implements GrantedAuthority {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Um perfil precisa ter um nome")
     private String nome;
 
     @ManyToMany
     @JoinTable(name = "usuarios_perfis",
-               joinColumns = @JoinColumn(name = "usuario_id"),
-               inverseJoinColumns = @JoinColumn(name = "perfil_id"))
+               joinColumns = @JoinColumn(name = "perfil_id"),
+               inverseJoinColumns = @JoinColumn(name = "usuario_id"))
     private Set<Usuario> usuarios;
 
     public Long getId() {
