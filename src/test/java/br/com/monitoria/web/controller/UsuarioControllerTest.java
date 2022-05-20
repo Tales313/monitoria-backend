@@ -57,4 +57,18 @@ class UsuarioControllerTest {
         assertEquals("20221370001", usuario.getMatricula());
     }
 
+    @Test
+    void badRequestAoCriarUsuarioComEmailEmBranco() throws Exception {
+
+        UsuarioRequest request = new UsuarioRequest("", "123456", "20221370001");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/usuarios")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(request))
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("Bad Request"))
+            .andExpect(jsonPath("$.message").value("não deve estar em branco"));
+    }
+
 }
