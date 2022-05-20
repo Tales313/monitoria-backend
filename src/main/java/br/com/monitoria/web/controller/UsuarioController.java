@@ -32,7 +32,7 @@ public class UsuarioController {
         String senha = hashService.hash(request.getSenha());
         Usuario usuario = new Usuario(request.getLogin(), senha, request.getMatricula());
         usuarioRepository.save(usuario);
-        return new UsuarioResponse(usuario.getLogin(), usuario.getSenha(), usuario.getDataCadastro(), usuario.getMatricula());
+        return new UsuarioResponse(usuario.getLogin(), usuario.getMatricula());
     }
 
 }
