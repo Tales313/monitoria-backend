@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -39,10 +40,12 @@ class UsuarioControllerTest {
         UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370001");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/usuarios")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(new ObjectMapper().writeValueAsString(request))
-        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(request))
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.login").value("teste@gmail.com"))
+            .andExpect(jsonPath("$.matricula").value("20221370001"));
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
 
