@@ -15,7 +15,7 @@ public class UsuarioRequest {
     private String login;
 
     @NotBlank
-    @Size(min = 6)
+    @Size(min = 8, max = 20)
     private String senha;
 
     @NotBlank

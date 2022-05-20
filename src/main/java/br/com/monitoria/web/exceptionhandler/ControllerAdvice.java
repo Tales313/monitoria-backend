@@ -39,6 +39,8 @@ public class ControllerAdvice {
         for(FieldError fieldError : fieldErrorList)
             mensagem = mensagem.concat(messageSource.getMessage(fieldError, LocaleContextHolder.getLocale())) + ";";
 
+        mensagem = mensagem.substring(0, mensagem.length()-1);
+
         return new ErrorMessage(
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
