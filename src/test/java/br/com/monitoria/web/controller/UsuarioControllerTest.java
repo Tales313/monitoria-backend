@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Optional;
@@ -34,15 +35,19 @@ class UsuarioControllerTest {
     @Autowired
     private HashService hashService;
 
+    private ResultActions enviarPost(UsuarioRequest request) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.post("/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(request))
+                .accept(MediaType.APPLICATION_JSON));
+    }
+
     @Test
-    void sucessoEmCriarUsuario() throws Exception {
+    void sucessoAoTentarCriarUsuario() throws Exception {
 
         UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370001");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/usuarios")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(new ObjectMapper().writeValueAsString(request))
-            .accept(MediaType.APPLICATION_JSON))
+        enviarPost(request)
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.login").value("teste@gmail.com"))
             .andExpect(jsonPath("$.matricula").value("20221370001"));
@@ -58,17 +63,34 @@ class UsuarioControllerTest {
     }
 
     @Test
-    void badRequestAoCriarUsuarioComEmailEmBranco() throws Exception {
+    void badRequestAoTentarCriarUsuarioComEmailEmBranco() throws Exception {
 
         UsuarioRequest request = new UsuarioRequest("", "123456", "20221370001");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/usuarios")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(new ObjectMapper().writeValueAsString(request))
-            .accept(MediaType.APPLICATION_JSON))
+        enviarPost(request)
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.error").value("Bad Request"))
             .andExpect(jsonPath("$.message").value("não deve estar em branco"));
+
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("");
+
+        assertTrue(usuarioOptional.isEmpty());
+    }
+
+    @Test
+    void badRequestAoTentarCriarUsuarioComEmailInvalido() throws Exception {
+
+        UsuarioRequest request = new UsuarioRequest("abc123", "123456", "20221370001");
+
+        enviarPost(request)
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("Bad Request"))
+            .andExpect(jsonPath("$.message").value("deve ser um endereço de e-mail bem formado"));
+
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("abc123");
+
+        assertTrue(usuarioOptional.isEmpty());
+
     }
 
 }
