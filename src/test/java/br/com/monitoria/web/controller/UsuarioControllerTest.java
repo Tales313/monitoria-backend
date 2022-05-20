@@ -90,7 +90,24 @@ class UsuarioControllerTest {
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("abc123");
 
         assertTrue(usuarioOptional.isEmpty());
+    }
 
+    @Test
+    void badRequestAoTentarCriarUsuarioComEmailQueJaExiste() throws Exception {
+        Usuario usuario = new Usuario("teste@gmail.com", "123456", "20221370001");
+        usuarioRepository.save(usuario);
+
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370002");
+
+        enviarPost(request)
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("Bad Request"))
+            .andExpect(jsonPath("$.message").value("Já existe um usuário com este email"));
+
+
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
+        assertTrue(usuarioOptional.isPresent());
+        assertEquals(1L, usuarioRepository.count());
     }
 
 }
