@@ -1,7 +1,7 @@
 package br.com.monitoria.web.request;
 
 import br.com.monitoria.domain.Usuario;
-import br.com.monitoria.util.ValorUnico;
+import br.com.monitoria.util.validators.ValorUnico;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
