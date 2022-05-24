@@ -15,3 +15,11 @@ spring:
 jwt:
   expiration: 86400000
   secret: jwt-dev-secret
+
+aws:
+  region: sa-east-1
+  sns:
+    topic:
+      product:
+        events:
+          arn: arn:aws:sns:sa-east-1:075970593276:cadastro-usuario:037aa884-42bf-4505-8245-f2db731d42a9
