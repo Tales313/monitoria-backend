@@ -4,3 +4,4 @@ Por enquanto o readme está sendo usado como uma espécie de backlog, para que e
 
 * Mais testes unitarios e integrados
 * Envio de email para cadastro de usuario (provavelmente com AWS Simple Email Service)
+* Autodeploy no EC2 a partir de commit na branch main.
