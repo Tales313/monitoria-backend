@@ -1,4 +1,4 @@
-package br.com.monitoria.util;
+package br.com.monitoria.util.validators;
 
 import org.springframework.util.Assert;
 

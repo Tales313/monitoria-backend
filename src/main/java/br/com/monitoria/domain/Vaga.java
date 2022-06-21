@@ -9,7 +9,8 @@ import javax.validation.constraints.Positive;
 public class Vaga {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_vaga")
+    @SequenceGenerator(name = "generator_vaga", sequenceName = "sequence_id_vaga")
     private Long id;
 
     @NotBlank(message = "A disciplina deve ser informada")

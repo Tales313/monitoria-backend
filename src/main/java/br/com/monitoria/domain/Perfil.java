@@ -10,7 +10,8 @@ import java.util.Set;
 public class Perfil implements GrantedAuthority {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_perfil")
+    @SequenceGenerator(name = "generator_perfil", sequenceName = "sequence_id_perfil")
     private Long id;
 
     @NotBlank(message = "Um perfil precisa ter um nome")

@@ -2,7 +2,7 @@ package br.com.monitoria.web.controller;
 
 import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.repository.UsuarioRepository;
-import br.com.monitoria.util.HashService;
+import br.com.monitoria.service.HashService;
 import br.com.monitoria.web.request.UsuarioRequest;
 import br.com.monitoria.web.response.UsuarioResponse;
 import org.springframework.http.HttpStatus;
@@ -32,7 +32,7 @@ public class UsuarioController {
         String senha = hashService.hash(request.getSenha());
         Usuario usuario = new Usuario(request.getLogin(), senha, request.getMatricula());
         usuarioRepository.save(usuario);
-        return new UsuarioResponse(usuario.getLogin(), usuario.getSenha(), usuario.getDataCadastro(), usuario.getMatricula());
+        return new UsuarioResponse(usuario.getLogin(), usuario.getMatricula());
     }
 
 }

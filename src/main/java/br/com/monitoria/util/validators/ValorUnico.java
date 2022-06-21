@@ -1,4 +1,4 @@
-package br.com.monitoria.util;
+package br.com.monitoria.util.validators;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

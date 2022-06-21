@@ -10,7 +10,8 @@ import java.time.LocalDate;
 public class Edital {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_edital")
+    @SequenceGenerator(name = "generator_edital", sequenceName = "sequence_id_edital")
     private Long id;
 
     @NotBlank(message = "O semestre não deve estar em branco")

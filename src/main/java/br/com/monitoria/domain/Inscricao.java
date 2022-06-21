@@ -11,7 +11,8 @@ import java.time.LocalDate;
 public class Inscricao {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_inscricao")
+    @SequenceGenerator(name = "generator_inscricao", sequenceName = "sequence_id_inscricao")
     private Long id;
 
     private LocalDate dataInscricao;

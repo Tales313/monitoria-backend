@@ -1,7 +1,7 @@
 package br.com.monitoria.web.controller;
 
 import br.com.monitoria.security.TokenService;
-import br.com.monitoria.util.HashService;
+import br.com.monitoria.service.HashService;
 import br.com.monitoria.web.request.LoginRequest;
 import br.com.monitoria.web.response.LoginResponse;
 import org.springframework.http.ResponseEntity;
