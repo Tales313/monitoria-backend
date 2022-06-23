@@ -119,4 +119,50 @@ class UsuarioControllerTest {
         assertTrue(usuarioOptional.isEmpty());
     }
 
+
+    @Test
+    void badRequestAoTentarCriarUsuarioComSenhaMenorQue6Digitos() throws Exception {
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "12345", "20221370002");
+
+        enviarPostEValidarMensagemDeBadRequest(request, "tamanho deve ser entre 6 e 20");
+
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
+
+        assertTrue(usuarioOptional.isEmpty());
+    }
+
+    @Test
+    void badRequestAoTentarCriarUsuarioComSenhaMaiorQue20Digitos() throws Exception {
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "abcdefghijklmnopqrstu", "20221370002");
+
+        enviarPostEValidarMensagemDeBadRequest(request, "tamanho deve ser entre 6 e 20");
+
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
+
+        assertTrue(usuarioOptional.isEmpty());
+    }
+
+
+    @Test
+    void badRequestAoTentarCriarUsuarioComMatriculaNula() throws Exception {
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", null);
+
+        enviarPostEValidarMensagemDeBadRequest(request, "não deve estar em branco");
+
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
+
+        assertTrue(usuarioOptional.isEmpty());
+    }
+
+    @Test
+    void badRequestAoTentarCriarUsuarioComMatriculaEmBranco() throws Exception {
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "");
+
+        enviarPostEValidarMensagemDeBadRequest(request, "não deve estar em branco");
+
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
+
+        assertTrue(usuarioOptional.isEmpty());
+    }
+
 }
