@@ -20,6 +20,12 @@ public class EditalRequest {
     @NotNull(message = "A data de fim das inscrições deve ser informada")
     private LocalDate fimInscricoes;
 
+    public EditalRequest(String semestre, LocalDate inicioInscricoes, LocalDate fimInscricoes) {
+        this.semestre = semestre;
+        this.inicioInscricoes = inicioInscricoes;
+        this.fimInscricoes = fimInscricoes;
+    }
+
     public Edital toModel(Usuario usuario) {
         return new Edital(semestre, inicioInscricoes, fimInscricoes, usuario);
     }

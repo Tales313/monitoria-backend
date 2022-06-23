@@ -102,7 +102,6 @@ class UsuarioControllerTest {
 
         enviarPostEValidarMensagemDeBadRequest(request, "Já existe um usuário com este email");
 
-
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
         assertTrue(usuarioOptional.isPresent());
         assertEquals(1L, usuarioRepository.count());
