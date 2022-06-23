@@ -42,6 +42,13 @@ class UsuarioControllerTest {
                 .accept(MediaType.APPLICATION_JSON));
     }
 
+    private void enviarPostEValidarMensagemDeBadRequest(UsuarioRequest request, String mensagemDeErro) throws Exception {
+        enviarPost(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value(mensagemDeErro));
+    }
+
     @Test
     void sucessoAoTentarCriarUsuario() throws Exception {
 
@@ -67,10 +74,7 @@ class UsuarioControllerTest {
 
         UsuarioRequest request = new UsuarioRequest("", "123456", "20221370001");
 
-        enviarPost(request)
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.error").value("Bad Request"))
-            .andExpect(jsonPath("$.message").value("não deve estar em branco"));
+        enviarPostEValidarMensagemDeBadRequest(request, "não deve estar em branco");
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("");
 
@@ -82,10 +86,7 @@ class UsuarioControllerTest {
 
         UsuarioRequest request = new UsuarioRequest("abc123", "123456", "20221370001");
 
-        enviarPost(request)
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.error").value("Bad Request"))
-            .andExpect(jsonPath("$.message").value("deve ser um endereço de e-mail bem formado"));
+        enviarPostEValidarMensagemDeBadRequest(request, "deve ser um endereço de e-mail bem formado");
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("abc123");
 
@@ -99,15 +100,23 @@ class UsuarioControllerTest {
 
         UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370002");
 
-        enviarPost(request)
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.error").value("Bad Request"))
-            .andExpect(jsonPath("$.message").value("Já existe um usuário com este email"));
+        enviarPostEValidarMensagemDeBadRequest(request, "Já existe um usuário com este email");
 
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
         assertTrue(usuarioOptional.isPresent());
         assertEquals(1L, usuarioRepository.count());
+    }
+
+    @Test
+    void badRequestAoTentarCriarUsuarioComSenhaNula() throws Exception {
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", null, "20221370002");
+
+        enviarPostEValidarMensagemDeBadRequest(request, "não deve ser nulo");
+
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
+
+        assertTrue(usuarioOptional.isEmpty());
     }
 
 }

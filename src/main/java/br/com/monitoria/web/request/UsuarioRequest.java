@@ -5,6 +5,7 @@ import br.com.monitoria.util.validators.ValorUnico;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class UsuarioRequest {
@@ -14,7 +15,7 @@ public class UsuarioRequest {
     @ValorUnico(classe = Usuario.class, nomeDoCampo = "login", message = "Já existe um usuário com este email")
     private String login;
 
-    @NotBlank
+    @NotNull
     @Size(min = 6, max = 20)
     private String senha;
 
