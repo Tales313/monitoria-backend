@@ -10,16 +10,16 @@ import javax.validation.constraints.Size;
 
 public class UsuarioRequest {
 
-    @NotBlank
+    @NotBlank(message = "O login não deve estar em branco")
     @Email
     @ValorUnico(classe = Usuario.class, nomeDoCampo = "login", message = "Já existe um usuário com este email")
     private String login;
 
-    @NotNull
+    @NotNull(message = "A senha não deve ser nula")
     @Size(min = 6, max = 20)
     private String senha;
 
-    @NotBlank
+    @NotBlank(message = "A matricula não deve estar em branco")
     private String matricula;
 
     public UsuarioRequest(String login, String senha, String matricula) {

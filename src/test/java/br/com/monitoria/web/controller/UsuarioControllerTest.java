@@ -74,7 +74,7 @@ class UsuarioControllerTest {
 
         UsuarioRequest request = new UsuarioRequest("", "123456", "20221370001");
 
-        enviarPostEValidarMensagemDeBadRequest(request, "não deve estar em branco");
+        enviarPostEValidarMensagemDeBadRequest(request, "O login não deve estar em branco");
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("");
 
@@ -111,7 +111,7 @@ class UsuarioControllerTest {
     void badRequestAoTentarCriarUsuarioComSenhaNula() throws Exception {
         UsuarioRequest request = new UsuarioRequest("teste@gmail.com", null, "20221370002");
 
-        enviarPostEValidarMensagemDeBadRequest(request, "não deve ser nulo");
+        enviarPostEValidarMensagemDeBadRequest(request, "A senha não deve ser nula");
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
 
@@ -146,7 +146,7 @@ class UsuarioControllerTest {
     void badRequestAoTentarCriarUsuarioComMatriculaNula() throws Exception {
         UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", null);
 
-        enviarPostEValidarMensagemDeBadRequest(request, "não deve estar em branco");
+        enviarPostEValidarMensagemDeBadRequest(request, "A matricula não deve estar em branco");
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
 
@@ -157,7 +157,7 @@ class UsuarioControllerTest {
     void badRequestAoTentarCriarUsuarioComMatriculaEmBranco() throws Exception {
         UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "");
 
-        enviarPostEValidarMensagemDeBadRequest(request, "não deve estar em branco");
+        enviarPostEValidarMensagemDeBadRequest(request, "A matricula não deve estar em branco");
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
 
