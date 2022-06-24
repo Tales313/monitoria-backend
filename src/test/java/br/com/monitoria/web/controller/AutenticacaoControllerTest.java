@@ -37,10 +37,6 @@ class AutenticacaoControllerTest {
     
     public AutenticacaoControllerTest() {
         this.objectMapper = new ObjectMapper();
-
-        objectMapper.findAndRegisterModules();
-        // Isso eh para que o spring consiga receber os dados do tipo LocalDate pelo
-        // request do EditalRequest. Sem essa linha ele da erro de jackson.
     }
 
     private ResultActions enviarPost(LoginRequest request) throws Exception {

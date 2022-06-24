@@ -89,6 +89,7 @@ class EditalControllerTest {
         assertEquals("2022.2", edital.getSemestre());
         assertEquals("2022-07-01", edital.getInicioInscricoes().toString());
         assertEquals("2022-07-15", edital.getFimInscricoes().toString());
+        assertEquals(1L, edital.getUsuario().getId());
     }
 
     @Test
