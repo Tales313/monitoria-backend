@@ -10,6 +10,9 @@ public class LoginResponse {
         this.tipo = tipo;
     }
 
+    public LoginResponse() {
+    }
+
     public String getToken() {
         return token;
     }
