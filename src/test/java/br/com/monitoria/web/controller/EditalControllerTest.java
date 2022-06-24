@@ -113,4 +113,37 @@ class EditalControllerTest {
         assertTrue(editais.isEmpty());
     }
 
+    @Test
+    void erroAoCriarEditalComSemestreInvalido() throws Exception {
+        EditalRequest editalRequest = new EditalRequest("123.4", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
+        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
+
+        enviarPostEValidarMensagemDeBadRequest(editalRequest, token, "O semestre deve ter o formato 2022.1");
+
+        List<Edital> editais = editalRepository.findAll();
+        assertTrue(editais.isEmpty());
+    }
+
+    @Test
+    void erroAoCriarEditalComInicioInscricoesNula() throws Exception {
+        EditalRequest editalRequest = new EditalRequest("2022.1", null, LocalDate.of(2022, 7, 15));
+        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
+
+        enviarPostEValidarMensagemDeBadRequest(editalRequest, token, "A data de inicio das incrições deve ser informada");
+
+        List<Edital> editais = editalRepository.findAll();
+        assertTrue(editais.isEmpty());
+    }
+
+    @Test
+    void erroAoCriarEditalComFimInscricoesNula() throws Exception {
+        EditalRequest editalRequest = new EditalRequest("2022.1", LocalDate.of(2022, 7, 1), null);
+        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
+
+        enviarPostEValidarMensagemDeBadRequest(editalRequest, token, "A data de fim das inscrições deve ser informada");
+
+        List<Edital> editais = editalRepository.findAll();
+        assertTrue(editais.isEmpty());
+    }
+
 }
