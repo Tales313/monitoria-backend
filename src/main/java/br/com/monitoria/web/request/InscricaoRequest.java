@@ -27,6 +27,13 @@ public class InscricaoRequest {
     @NotNull(message = "O id da vaga deve ser informado")
     private Long idVaga;
 
+    public InscricaoRequest(Integer opcao, Double notaDisciplina, Double cre, Long idVaga) {
+        this.opcao = opcao;
+        this.notaDisciplina = notaDisciplina;
+        this.cre = cre;
+        this.idVaga = idVaga;
+    }
+
     public Inscricao toModel(VagaRepository vagaRepository, Double media, Usuario usuario) {
 
         Vaga vaga = vagaRepository.findById(idVaga).orElseThrow(
