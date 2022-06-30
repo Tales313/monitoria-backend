@@ -147,4 +147,15 @@ class EditalControllerTest {
         assertTrue(editais.isEmpty());
     }
 
+    @Test
+    void erroAoCriarEditalComDataInicioInscricoesAposDataFimInscricoes() throws Exception {
+        EditalRequest editalRequest = new EditalRequest("2022.1", LocalDate.of(2022, 7, 15), LocalDate.of(2022, 7, 1));
+        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
+
+        enviarPostEValidarMensagemDeBadRequest(editalRequest, token, "A data de início das inscrições deve ser antes da data de fim das incrições");
+
+        List<Edital> editais = editalRepository.findAll();
+        assertTrue(editais.isEmpty());
+    }
+
 }
