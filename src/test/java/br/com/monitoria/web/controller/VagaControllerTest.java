@@ -8,6 +8,7 @@ import br.com.monitoria.repository.UsuarioRepository;
 import br.com.monitoria.repository.VagaRepository;
 import br.com.monitoria.web.request.VagaRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -47,8 +48,22 @@ class VagaControllerTest {
 
     private ObjectMapper objectMapper;
 
+    private String token;
+
+    private Usuario usuario;
+
+    private Edital edital;
+
     public VagaControllerTest() {
         this.objectMapper = new ObjectMapper();
+    }
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        this.token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
+        this.usuario = usuarioRepository.findByLogin("teste@gmail.com").get();
+        this.edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
+        editalRepository.save(edital);
     }
 
     private ResultActions enviarPost(VagaRequest request, String token) throws Exception {
@@ -69,10 +84,6 @@ class VagaControllerTest {
 
     @Test
     void sucessoAoCriarVaga() throws Exception {
-        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
-        Usuario usuario = usuarioRepository.findByLogin("teste@gmail.com").get();
-        Edital edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
-        editalRepository.save(edital);
 
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 2, edital.getId());
 
@@ -99,11 +110,6 @@ class VagaControllerTest {
 
     @Test
     void erroAoCriarVagaComDisciplinaEmBranco() throws Exception {
-        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
-        Usuario usuario = usuarioRepository.findByLogin("teste@gmail.com").get();
-        Edital edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
-        editalRepository.save(edital);
-
         VagaRequest vagaRequest = new VagaRequest("", "2", 2, edital.getId());
 
         enviarPostEValidarMensagemDeBadRequest(vagaRequest, token, "A disciplina deve ser informada");
@@ -114,11 +120,6 @@ class VagaControllerTest {
 
     @Test
     void erroAoCriarVagaComPeriodoEmBranco() throws Exception {
-        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
-        Usuario usuario = usuarioRepository.findByLogin("teste@gmail.com").get();
-        Edital edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
-        editalRepository.save(edital);
-
         VagaRequest vagaRequest = new VagaRequest("Javascript", "", 2, edital.getId());
 
         enviarPostEValidarMensagemDeBadRequest(vagaRequest, token, "O periodo deve ser informado");
@@ -129,11 +130,6 @@ class VagaControllerTest {
 
     @Test
     void erroAoCriarVagaComQuantidadeNula() throws Exception {
-        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
-        Usuario usuario = usuarioRepository.findByLogin("teste@gmail.com").get();
-        Edital edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
-        editalRepository.save(edital);
-
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", null, edital.getId());
 
         enviarPostEValidarMensagemDeBadRequest(vagaRequest, token, "A quantidade deve ser informada");
@@ -144,11 +140,6 @@ class VagaControllerTest {
 
     @Test
     void erroAoCriarVagaComQuantidadeZero() throws Exception {
-        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
-        Usuario usuario = usuarioRepository.findByLogin("teste@gmail.com").get();
-        Edital edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
-        editalRepository.save(edital);
-
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 0, edital.getId());
 
         enviarPostEValidarMensagemDeBadRequest(vagaRequest, token, "A quantidade deve ter valor positivo");
@@ -159,11 +150,6 @@ class VagaControllerTest {
 
     @Test
     void erroAoCriarVagaComIdEditalNull() throws Exception {
-        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
-        Usuario usuario = usuarioRepository.findByLogin("teste@gmail.com").get();
-        Edital edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
-        editalRepository.save(edital);
-
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 2, null);
 
         enviarPostEValidarMensagemDeBadRequest(vagaRequest, token, "O id do edital deve ser informado");
