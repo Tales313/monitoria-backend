@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -75,10 +76,10 @@ class VagaControllerTest {
                 .accept(MediaType.APPLICATION_JSON));
     }
 
-    private void enviarPostEValidarMensagemDeBadRequest(VagaRequest request, String mensagemDeErro) throws Exception {
+    private void enviarPostEValidarErro(VagaRequest request, String mensagemDeErro, HttpStatus status) throws Exception {
         enviarPost(request)
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(status().is(status.value()))
+                .andExpect(jsonPath("$.error").value(status.getReasonPhrase()))
                 .andExpect(jsonPath("$.message").value(mensagemDeErro));
     }
 
@@ -112,7 +113,7 @@ class VagaControllerTest {
     void erroAoCriarVagaComDisciplinaEmBranco() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("", "2", 2, edital.getId());
 
-        enviarPostEValidarMensagemDeBadRequest(vagaRequest, "A disciplina deve ser informada");
+        enviarPostEValidarErro(vagaRequest, "A disciplina deve ser informada", HttpStatus.BAD_REQUEST);
 
         List<Vaga> vagas = vagaRepository.findAll();
         assertTrue(vagas.isEmpty());
@@ -122,7 +123,7 @@ class VagaControllerTest {
     void erroAoCriarVagaComPeriodoEmBranco() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "", 2, edital.getId());
 
-        enviarPostEValidarMensagemDeBadRequest(vagaRequest, "O periodo deve ser informado");
+        enviarPostEValidarErro(vagaRequest, "O periodo deve ser informado", HttpStatus.BAD_REQUEST);
 
         List<Vaga> vagas = vagaRepository.findAll();
         assertTrue(vagas.isEmpty());
@@ -132,7 +133,7 @@ class VagaControllerTest {
     void erroAoCriarVagaComQuantidadeNula() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", null, edital.getId());
 
-        enviarPostEValidarMensagemDeBadRequest(vagaRequest, "A quantidade deve ser informada");
+        enviarPostEValidarErro(vagaRequest, "A quantidade deve ser informada", HttpStatus.BAD_REQUEST);
 
         List<Vaga> vagas = vagaRepository.findAll();
         assertTrue(vagas.isEmpty());
@@ -142,7 +143,7 @@ class VagaControllerTest {
     void erroAoCriarVagaComQuantidadeZero() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 0, edital.getId());
 
-        enviarPostEValidarMensagemDeBadRequest(vagaRequest, "A quantidade deve ter valor positivo");
+        enviarPostEValidarErro(vagaRequest, "A quantidade deve ter valor positivo", HttpStatus.BAD_REQUEST);
 
         List<Vaga> vagas = vagaRepository.findAll();
         assertTrue(vagas.isEmpty());
@@ -152,7 +153,17 @@ class VagaControllerTest {
     void erroAoCriarVagaComIdEditalNull() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 2, null);
 
-        enviarPostEValidarMensagemDeBadRequest(vagaRequest, "O id do edital deve ser informado");
+        enviarPostEValidarErro(vagaRequest, "O id do edital deve ser informado", HttpStatus.BAD_REQUEST);
+
+        List<Vaga> vagas = vagaRepository.findAll();
+        assertTrue(vagas.isEmpty());
+    }
+
+    @Test
+    void erroAoCriarVagaComIdEditalInexistente() throws Exception {
+        VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 2, 2L);
+
+        enviarPostEValidarErro(vagaRequest, "Edital não encontrado", HttpStatus.NOT_FOUND);
 
         List<Vaga> vagas = vagaRepository.findAll();
         assertTrue(vagas.isEmpty());
