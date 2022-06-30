@@ -77,6 +77,13 @@ class EditalControllerTest {
                 .andExpect(jsonPath("$.message").value(mensagemDeErro));
     }
 
+    private ResultActions enviarGet(Long id) throws Exception {
+
+        return mockMvc.perform(MockMvcRequestBuilders.get("/editais/" + id)
+                .header("Authorization", "Bearer " + token)
+                .accept(MediaType.APPLICATION_JSON));
+    }
+
     @Test
     void sucessoAoTentarCriarEdital() throws Exception {
 
@@ -160,6 +167,28 @@ class EditalControllerTest {
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
+    }
+
+    @Test
+    void buscarEditalComSucesso() throws Exception {
+        Edital edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
+        edital = editalRepository.save(edital);
+
+        enviarGet(edital.getId())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.semestre").value("2022.2"))
+                .andExpect(jsonPath("$.inicioInscricoes").value("2022-07-01"))
+                .andExpect(jsonPath("$.fimInscricoes").value("2022-07-15"));
+    }
+
+    @Test
+    void erroAoBuscarEditalNaoExistente() throws Exception {
+
+        enviarGet(1L)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Edital não encontrado"));
     }
 
 }
