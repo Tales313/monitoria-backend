@@ -59,7 +59,7 @@ class VagaControllerTest {
     }
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         this.token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
         this.usuario = usuarioRepository.findByLogin("teste@gmail.com").get();
         this.edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);

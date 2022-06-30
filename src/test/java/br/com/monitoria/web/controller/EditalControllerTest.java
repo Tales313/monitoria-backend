@@ -1,10 +1,12 @@
 package br.com.monitoria.web.controller;
 
 import br.com.monitoria.domain.Edital;
+import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.repository.EditalRepository;
 import br.com.monitoria.repository.UsuarioRepository;
 import br.com.monitoria.web.request.EditalRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -41,6 +43,10 @@ class EditalControllerTest {
 
     private ObjectMapper objectMapper;
 
+    private String token;
+
+    private Usuario usuario;
+
     public EditalControllerTest() {
         this.objectMapper = new ObjectMapper();
 
@@ -49,8 +55,13 @@ class EditalControllerTest {
         // request do EditalRequest. Sem essa linha ele da erro de jackson.
     }
 
+    @BeforeEach
+    void setUp() throws Exception {
+        this.token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
+        this.usuario = usuarioRepository.findByLogin("teste@gmail.com").get();
+    }
 
-    private ResultActions enviarPost(EditalRequest request, String token) throws Exception {
+    private ResultActions enviarPost(EditalRequest request) throws Exception {
 
         return mockMvc.perform(MockMvcRequestBuilders.post("/editais")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -59,8 +70,8 @@ class EditalControllerTest {
                 .accept(MediaType.APPLICATION_JSON));
     }
 
-    private void enviarPostEValidarMensagemDeBadRequest(EditalRequest request, String token, String mensagemDeErro) throws Exception {
-        enviarPost(request, token)
+    private void enviarPostEValidarMensagemDeBadRequest(EditalRequest request, String mensagemDeErro) throws Exception {
+        enviarPost(request)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Bad Request"))
                 .andExpect(jsonPath("$.message").value(mensagemDeErro));
@@ -70,9 +81,8 @@ class EditalControllerTest {
     void sucessoAoTentarCriarEdital() throws Exception {
 
         EditalRequest editalRequest = new EditalRequest("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
-        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
 
-        enviarPost(editalRequest, token)
+        enviarPost(editalRequest)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.semestre").value("2022.2"))
@@ -89,15 +99,14 @@ class EditalControllerTest {
         assertEquals("2022.2", edital.getSemestre());
         assertEquals("2022-07-01", edital.getInicioInscricoes().toString());
         assertEquals("2022-07-15", edital.getFimInscricoes().toString());
-        assertEquals(1L, edital.getUsuario().getId());
+        assertEquals(1L, usuario.getId());
     }
 
     @Test
     void erroAoCriarEditalComSemestreNulo() throws Exception {
         EditalRequest editalRequest = new EditalRequest(null, LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
-        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
 
-        enviarPostEValidarMensagemDeBadRequest(editalRequest, token, "O semestre deve ser informado");
+        enviarPostEValidarMensagemDeBadRequest(editalRequest, "O semestre deve ser informado");
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
@@ -106,9 +115,8 @@ class EditalControllerTest {
     @Test
     void erroAoCriarEditalComSemestreEmBranco() throws Exception {
         EditalRequest editalRequest = new EditalRequest("", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
-        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
 
-        enviarPostEValidarMensagemDeBadRequest(editalRequest, token, "O semestre deve ter o formato 2022.1");
+        enviarPostEValidarMensagemDeBadRequest(editalRequest, "O semestre deve ter o formato 2022.1");
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
@@ -117,9 +125,8 @@ class EditalControllerTest {
     @Test
     void erroAoCriarEditalComSemestreInvalido() throws Exception {
         EditalRequest editalRequest = new EditalRequest("123.4", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
-        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
 
-        enviarPostEValidarMensagemDeBadRequest(editalRequest, token, "O semestre deve ter o formato 2022.1");
+        enviarPostEValidarMensagemDeBadRequest(editalRequest, "O semestre deve ter o formato 2022.1");
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
@@ -128,9 +135,8 @@ class EditalControllerTest {
     @Test
     void erroAoCriarEditalComInicioInscricoesNula() throws Exception {
         EditalRequest editalRequest = new EditalRequest("2022.1", null, LocalDate.of(2022, 7, 15));
-        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
 
-        enviarPostEValidarMensagemDeBadRequest(editalRequest, token, "A data de inicio das incrições deve ser informada");
+        enviarPostEValidarMensagemDeBadRequest(editalRequest, "A data de inicio das incrições deve ser informada");
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
@@ -139,9 +145,8 @@ class EditalControllerTest {
     @Test
     void erroAoCriarEditalComFimInscricoesNula() throws Exception {
         EditalRequest editalRequest = new EditalRequest("2022.1", LocalDate.of(2022, 7, 1), null);
-        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
 
-        enviarPostEValidarMensagemDeBadRequest(editalRequest, token, "A data de fim das inscrições deve ser informada");
+        enviarPostEValidarMensagemDeBadRequest(editalRequest, "A data de fim das inscrições deve ser informada");
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
@@ -150,9 +155,8 @@ class EditalControllerTest {
     @Test
     void erroAoCriarEditalComDataInicioInscricoesAposDataFimInscricoes() throws Exception {
         EditalRequest editalRequest = new EditalRequest("2022.1", LocalDate.of(2022, 7, 15), LocalDate.of(2022, 7, 1));
-        String token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
 
-        enviarPostEValidarMensagemDeBadRequest(editalRequest, token, "A data de início das inscrições deve ser antes da data de fim das incrições");
+        enviarPostEValidarMensagemDeBadRequest(editalRequest, "A data de início das inscrições deve ser antes da data de fim das incrições");
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
