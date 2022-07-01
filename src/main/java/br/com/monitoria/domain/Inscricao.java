@@ -22,7 +22,7 @@ public class Inscricao {
     private Integer opcao;
 
     @NotNull(message = "A nota da disciplina deve ser informada")
-    @Range(min = 0, max = 100, message = "A nota da disciplina deve ser entre 0 e 100")
+    @Range(min = 70, max = 100, message = "A nota da disciplina deve ser entre 70 e 100")
     private Double notaDisciplina;
 
     @NotNull(message = "O CRE deve ser informado")
@@ -49,8 +49,8 @@ public class Inscricao {
     }
 
     public Inscricao(@NotNull(message = "A opcao deve ser informada") @Range(min = 1, max = 2, message = "A opcao deve ser 1 ou 2") Integer opcao,
-                     @NotNull(message = "A nota da disciplina deve ser informada") @Positive(message = "A nota da disciplina deve ter valor positivo") Double notaDisciplina,
-                     @NotNull(message = "O CRE deve ser informado") @Positive(message = "O CRE deve ter valor positivo") Double cre,
+                     @NotNull(message = "A nota da disciplina deve ser informada") @Positive(message = "A nota da disciplina deve ser entre 70 e 100") Double notaDisciplina,
+                     @NotNull(message = "O CRE deve ser informado") @Range(min = 0, max = 100, message = "O CRE deve ser entre 0 e 100") Double cre,
                      @NotNull(message = "A média deve ser informada") @Positive(message = "A média deve ter valor positivo") Double media,
                      @NotNull(message = "Uma inscrição deve ter uma vaga") Vaga vaga,
                      @NotNull(message = "Uma inscrição pertence a um usuario") Usuario usuario) {

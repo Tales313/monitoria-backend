@@ -6,7 +6,6 @@ import br.com.monitoria.repository.InscricaoRepository;
 import br.com.monitoria.repository.UsuarioRepository;
 import br.com.monitoria.repository.VagaRepository;
 import br.com.monitoria.web.request.InscricaoRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -162,9 +161,9 @@ class InscricaoControllerTest {
 
     @Test
     void erroAoCriarInscricaoComNotaDisciplinaAbaixoDoRange() throws Exception {
-        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, -1.0, 70.0, 1L);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 69.9, 70.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A nota da disciplina deve ser entre 0 e 100");
+        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A nota da disciplina deve ser entre 70 e 100");
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -174,7 +173,7 @@ class InscricaoControllerTest {
     void erroAoCriarInscricaoComNotaDisciplinaAcimaDoRange() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 101.0, 70.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A nota da disciplina deve ser entre 0 e 100");
+        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A nota da disciplina deve ser entre 70 e 100");
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
