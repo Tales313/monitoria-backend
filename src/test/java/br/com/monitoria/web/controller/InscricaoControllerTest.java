@@ -91,16 +91,16 @@ class InscricaoControllerTest {
     @Test
     void sucessoAoCriarInscricao() throws Exception {
 
-        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 8.5, 7.0, 1L);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, 1L);
 
         enviarPost(inscricaoRequest)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.dataInscricao").value(LocalDate.now().toString()))
                 .andExpect(jsonPath("$.opcao").value(1))
-                .andExpect(jsonPath("$.notaDisciplina").value(8.5))
-                .andExpect(jsonPath("$.cre").value(7.0))
-                .andExpect(jsonPath("$.media").value(8.05))
+                .andExpect(jsonPath("$.notaDisciplina").value(85.0))
+                .andExpect(jsonPath("$.cre").value(70.0))
+                .andExpect(jsonPath("$.media").value(80.5))
                 .andExpect(jsonPath("$.resultado").value(ResultadoEnum.AGUARDANDO.toString()));
 
         Optional<Inscricao> optionalInscricao = inscricaoRepository.findById(1L);
@@ -112,9 +112,9 @@ class InscricaoControllerTest {
         assertEquals(1L, inscricao.getId());
         assertEquals(LocalDate.now(), inscricao.getDataInscricao());
         assertEquals(1, inscricao.getOpcao());
-        assertEquals(8.5, inscricao.getNotaDisciplina());
-        assertEquals(7.0, inscricao.getCre());
-        assertEquals(8.05, inscricao.getMedia());
+        assertEquals(85.0, inscricao.getNotaDisciplina());
+        assertEquals(70.0, inscricao.getCre());
+        assertEquals(80.5, inscricao.getMedia());
         assertEquals(ResultadoEnum.AGUARDANDO, inscricao.getResultado());
         assertEquals(1L, inscricao.getVaga().getId());
         assertEquals(1L, inscricao.getUsuario().getId());
@@ -122,7 +122,7 @@ class InscricaoControllerTest {
 
     @Test
     void erroAoCriarInscricaoComOpcaoNula() throws Exception {
-        InscricaoRequest inscricaoRequest = new InscricaoRequest(null, 8.5, 7.0, 1L);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(null, 85.0, 70.0, 1L);
 
         enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A opcao deve ser informada");
 
@@ -132,7 +132,7 @@ class InscricaoControllerTest {
 
     @Test
     void erroAoCriarInscricaoComOpcaoAbaixoDoRange() throws Exception {
-        InscricaoRequest inscricaoRequest = new InscricaoRequest(0, 8.5, 7.0, 1L);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(0, 85.0, 70.0, 1L);
 
         enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A opcao deve ser 1 ou 2");
 
@@ -142,7 +142,7 @@ class InscricaoControllerTest {
 
     @Test
     void erroAoCriarInscricaoComOpcaoAcimaDoRange() throws Exception {
-        InscricaoRequest inscricaoRequest = new InscricaoRequest(3, 8.5, 7.0, 1L);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(3, 85.0, 70.0, 1L);
 
         enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A opcao deve ser 1 ou 2");
 
@@ -152,7 +152,7 @@ class InscricaoControllerTest {
 
     @Test
     void erroAoCriarInscricaoComNotaDisciplinaNula() throws Exception {
-        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, null, 7.0, 1L);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, null, 70.0, 1L);
 
         enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A nota da disciplina deve ser informada");
 
@@ -162,9 +162,9 @@ class InscricaoControllerTest {
 
     @Test
     void erroAoCriarInscricaoComNotaDisciplinaAbaixoDoRange() throws Exception {
-        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, -0.1, 7.0, 1L);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, -1.0, 70.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A nota da disciplina deve ser entre 0 e 10");
+        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A nota da disciplina deve ser entre 0 e 100");
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -172,9 +172,9 @@ class InscricaoControllerTest {
 
     @Test
     void erroAoCriarInscricaoComNotaDisciplinaAcimaDoRange() throws Exception {
-        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, -10.01, 7.0, 1L);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 101.0, 70.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A nota da disciplina deve ser entre 0 e 10");
+        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A nota da disciplina deve ser entre 0 e 100");
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -182,7 +182,7 @@ class InscricaoControllerTest {
 
     @Test
     void erroAoCriarInscricaoComCreNull() throws Exception {
-        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 8.5, null, 1L);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, null, 1L);
 
         enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "O CRE deve ser informado");
 
@@ -192,9 +192,9 @@ class InscricaoControllerTest {
 
     @Test
     void erroAoCriarInscricaoComCreAbaixoDoRange() throws Exception {
-        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 8.5, -0.1, 1L);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, -1.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "O CRE deve ser entre 0 e 10");
+        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "O CRE deve ser entre 0 e 100");
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -202,9 +202,9 @@ class InscricaoControllerTest {
 
     @Test
     void erroAoCriarInscricaoComCreAcimaDoRange() throws Exception {
-        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 8.5, 10.01, 1L);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 101.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "O CRE deve ser entre 0 e 10");
+        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "O CRE deve ser entre 0 e 100");
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -212,7 +212,7 @@ class InscricaoControllerTest {
 
     @Test
     void erroAoCriarInscricaoComIdVagaNula() throws Exception {
-        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 8.5, 7.0, null);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, null);
 
         enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "O id da vaga deve ser informado");
 

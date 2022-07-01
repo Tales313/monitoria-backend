@@ -16,11 +16,11 @@ public class InscricaoRequest {
     private Integer opcao;
 
     @NotNull(message = "A nota da disciplina deve ser informada")
-    @Range(min = 0, max = 10, message = "A nota da disciplina deve ser entre 0 e 10")
+    @Range(min = 0, max = 100, message = "A nota da disciplina deve ser entre 0 e 100")
     private Double notaDisciplina;
 
     @NotNull(message = "O CRE deve ser informado")
-    @Range(min = 0, max = 10, message = "O CRE deve ser entre 0 e 10")
+    @Range(min = 0, max = 100, message = "O CRE deve ser entre 0 e 100")
     private Double cre;
 
     @NotNull(message = "O id da vaga deve ser informado")

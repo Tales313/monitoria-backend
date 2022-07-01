@@ -163,7 +163,7 @@ class VagaControllerTest {
     void erroAoCriarVagaComIdEditalInexistente() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 2, 2L);
 
-        enviarPostEValidarErro(vagaRequest, "Edital não encontrado", HttpStatus.NOT_FOUND);
+        enviarPostEValidarErro(vagaRequest, "Edital não encontrado", HttpStatus.BAD_REQUEST);
 
         List<Vaga> vagas = vagaRepository.findAll();
         assertTrue(vagas.isEmpty());

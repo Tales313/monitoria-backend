@@ -22,11 +22,11 @@ public class Inscricao {
     private Integer opcao;
 
     @NotNull(message = "A nota da disciplina deve ser informada")
-    @Positive(message = "A nota da disciplina deve ter valor positivo")
+    @Range(min = 0, max = 100, message = "A nota da disciplina deve ser entre 0 e 100")
     private Double notaDisciplina;
 
     @NotNull(message = "O CRE deve ser informado")
-    @Positive(message = "O CRE deve ter valor positivo")
+    @Range(min = 0, max = 100, message = "O CRE deve ser entre 0 e 100")
     private Double cre;
 
     @NotNull(message = "A média deve ser informada")
