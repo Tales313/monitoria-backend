@@ -1,5 +1,6 @@
 package br.com.monitoria.web.exceptionhandler;
 
+import br.com.monitoria.exception.DataInscricoesException;
 import br.com.monitoria.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -48,11 +49,20 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage handleNotFoundException(NotFoundException ex) {
         return new ErrorMessage(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ex.getMessage());
+    }
+
+    @ExceptionHandler(DataInscricoesException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorMessage handleDataInscricoesException(DataInscricoesException ex) {
+        return new ErrorMessage(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 ex.getMessage());
     }
 
