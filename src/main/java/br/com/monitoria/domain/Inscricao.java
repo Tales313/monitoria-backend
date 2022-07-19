@@ -12,7 +12,7 @@ public class Inscricao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_inscricao")
-    @SequenceGenerator(name = "generator_inscricao", sequenceName = "sequence_id_inscricao")
+    @SequenceGenerator(name = "generator_inscricao", sequenceName = "sequence_id_inscricao", allocationSize = 1)
     private Long id;
 
     private LocalDate dataInscricao;

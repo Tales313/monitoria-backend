@@ -24,7 +24,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static br.com.monitoria.testUtils.UsuarioTestUtils.criarUsuarioEAutenticar;
+import static br.com.monitoria.testUtils.UsuarioTestUtils.autenticarComAdmin;
+import static br.com.monitoria.testUtils.UsuarioTestUtils.autenticarComAluno;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -61,8 +62,8 @@ class VagaControllerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        this.token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
-        this.usuario = usuarioRepository.findByLogin("teste@gmail.com").get();
+        this.token = autenticarComAdmin(objectMapper, mockMvc);
+        this.usuario = usuarioRepository.findByLogin("admin@gmail.com").get();
         this.edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
         editalRepository.save(edital);
     }
@@ -76,9 +77,10 @@ class VagaControllerTest {
                 .accept(MediaType.APPLICATION_JSON));
     }
 
-    private void enviarPostEValidarErro(VagaRequest request, String mensagemDeErro, HttpStatus status) throws Exception {
+    private void enviarPostEValidarRespostaDeErro(VagaRequest request, String mensagemDeErro, HttpStatus status) throws Exception {
         enviarPost(request)
                 .andExpect(status().is(status.value()))
+                .andExpect(jsonPath("$.status").value(status.value()))
                 .andExpect(jsonPath("$.error").value(status.getReasonPhrase()))
                 .andExpect(jsonPath("$.message").value(mensagemDeErro));
     }
@@ -113,7 +115,7 @@ class VagaControllerTest {
     void erroAoCriarVagaComDisciplinaEmBranco() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("", "2", 2, edital.getId());
 
-        enviarPostEValidarErro(vagaRequest, "A disciplina deve ser informada", HttpStatus.BAD_REQUEST);
+        enviarPostEValidarRespostaDeErro(vagaRequest, "A disciplina deve ser informada", HttpStatus.BAD_REQUEST);
 
         List<Vaga> vagas = vagaRepository.findAll();
         assertTrue(vagas.isEmpty());
@@ -123,7 +125,7 @@ class VagaControllerTest {
     void erroAoCriarVagaComPeriodoEmBranco() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "", 2, edital.getId());
 
-        enviarPostEValidarErro(vagaRequest, "O periodo deve ser informado", HttpStatus.BAD_REQUEST);
+        enviarPostEValidarRespostaDeErro(vagaRequest, "O periodo deve ser informado", HttpStatus.BAD_REQUEST);
 
         List<Vaga> vagas = vagaRepository.findAll();
         assertTrue(vagas.isEmpty());
@@ -133,7 +135,7 @@ class VagaControllerTest {
     void erroAoCriarVagaComQuantidadeNula() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", null, edital.getId());
 
-        enviarPostEValidarErro(vagaRequest, "A quantidade deve ser informada", HttpStatus.BAD_REQUEST);
+        enviarPostEValidarRespostaDeErro(vagaRequest, "A quantidade deve ser informada", HttpStatus.BAD_REQUEST);
 
         List<Vaga> vagas = vagaRepository.findAll();
         assertTrue(vagas.isEmpty());
@@ -143,7 +145,7 @@ class VagaControllerTest {
     void erroAoCriarVagaComQuantidadeZero() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 0, edital.getId());
 
-        enviarPostEValidarErro(vagaRequest, "A quantidade deve ter valor positivo", HttpStatus.BAD_REQUEST);
+        enviarPostEValidarRespostaDeErro(vagaRequest, "A quantidade deve ter valor positivo", HttpStatus.BAD_REQUEST);
 
         List<Vaga> vagas = vagaRepository.findAll();
         assertTrue(vagas.isEmpty());
@@ -153,7 +155,7 @@ class VagaControllerTest {
     void erroAoCriarVagaComIdEditalNull() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 2, null);
 
-        enviarPostEValidarErro(vagaRequest, "O id do edital deve ser informado", HttpStatus.BAD_REQUEST);
+        enviarPostEValidarRespostaDeErro(vagaRequest, "O id do edital deve ser informado", HttpStatus.BAD_REQUEST);
 
         List<Vaga> vagas = vagaRepository.findAll();
         assertTrue(vagas.isEmpty());
@@ -163,7 +165,18 @@ class VagaControllerTest {
     void erroAoCriarVagaComIdEditalInexistente() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 2, 2L);
 
-        enviarPostEValidarErro(vagaRequest, "Edital não encontrado", HttpStatus.BAD_REQUEST);
+        enviarPostEValidarRespostaDeErro(vagaRequest, "Edital não encontrado", HttpStatus.BAD_REQUEST);
+
+        List<Vaga> vagas = vagaRepository.findAll();
+        assertTrue(vagas.isEmpty());
+    }
+
+    @Test
+    void erroAoCriarVagaComTokenDeUsuarioAluno() throws Exception {
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+
+        VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 2, edital.getId());
+        enviarPostEValidarRespostaDeErro(vagaRequest, "Você não tem autorização para executar essa ação.", HttpStatus.FORBIDDEN);
 
         List<Vaga> vagas = vagaRepository.findAll();
         assertTrue(vagas.isEmpty());
