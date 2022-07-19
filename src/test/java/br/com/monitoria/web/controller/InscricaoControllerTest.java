@@ -1,10 +1,7 @@
 package br.com.monitoria.web.controller;
 
 import br.com.monitoria.domain.*;
-import br.com.monitoria.repository.EditalRepository;
-import br.com.monitoria.repository.InscricaoRepository;
-import br.com.monitoria.repository.UsuarioRepository;
-import br.com.monitoria.repository.VagaRepository;
+import br.com.monitoria.repository.*;
 import br.com.monitoria.web.request.InscricaoRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static br.com.monitoria.testUtils.UsuarioTestUtils.criarUsuarioEAutenticar;
+import static br.com.monitoria.testUtils.UsuarioTestUtils.autenticarComAdmin;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -63,8 +60,8 @@ class InscricaoControllerTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        this.token = criarUsuarioEAutenticar(usuarioRepository, objectMapper, mockMvc);
-        this.usuario = usuarioRepository.findByLogin("teste@gmail.com").get();
+        this.token = autenticarComAdmin(objectMapper, mockMvc);
+        this.usuario = usuarioRepository.findByLogin("admin@gmail.com").get();
         this.edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
         editalRepository.save(edital);
         this.vaga = new Vaga("Javascript", "2", 2, edital, usuario);

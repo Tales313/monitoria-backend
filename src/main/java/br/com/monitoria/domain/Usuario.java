@@ -16,7 +16,7 @@ public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_usuario")
-    @SequenceGenerator(name = "generator_usuario", sequenceName = "sequence_id_usuario")
+    @SequenceGenerator(name = "generator_usuario", sequenceName = "sequence_id_usuario", allocationSize = 1)
     private Long id;
 
     @NotBlank
@@ -44,11 +44,19 @@ public class Usuario implements UserDetails {
      * @param login
      * @param senha deve entrar ja criptografada
      */
-    public Usuario(String login, String senha, String matricula) {
+    public Usuario(@NotBlank @Email String login, @NotBlank String senha, @NotBlank String matricula) {
         this.login = login;
         this.senha = senha;
         this.dataCadastro = LocalDateTime.now();
         this.matricula = matricula;
+    }
+
+    // apenas para testes
+    public Usuario(@NotBlank @Email String login, @NotBlank String senha, @NotBlank String matricula, Perfil perfil) {
+        this.login = login;
+        this.senha = senha;
+        this.matricula = matricula;
+        this.perfis = Set.of(perfil);
     }
 
     public Long getId() {

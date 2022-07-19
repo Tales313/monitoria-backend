@@ -104,7 +104,6 @@ class UsuarioControllerTest {
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
         assertTrue(usuarioOptional.isPresent());
-        assertEquals(1L, usuarioRepository.count());
     }
 
     @Test
