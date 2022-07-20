@@ -32,16 +32,12 @@ public class Perfil implements GrantedAuthority {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public PerfilEnum getNome() {
         return nome;
     }
 
-    public void setNome(PerfilEnum nome) {
-        this.nome = nome;
+    public void addUsuario(Usuario usuario) {
+        this.usuarios.add(usuario);
     }
 
     @Override

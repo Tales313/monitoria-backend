@@ -32,7 +32,7 @@ public class Usuario implements UserDetails {
     @NotBlank
     private String matricula;
 
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "usuarios")
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "usuarios", cascade = CascadeType.PERSIST)
     private Set<Perfil> perfis;
 
     public Usuario() {
@@ -44,18 +44,11 @@ public class Usuario implements UserDetails {
      * @param login
      * @param senha deve entrar ja criptografada
      */
-    public Usuario(@NotBlank @Email String login, @NotBlank String senha, @NotBlank String matricula) {
-        this.login = login;
-        this.senha = senha;
-        this.dataCadastro = LocalDateTime.now();
-        this.matricula = matricula;
-    }
-
-    // apenas para testes
     public Usuario(@NotBlank @Email String login, @NotBlank String senha, @NotBlank String matricula, Perfil perfil) {
         this.login = login;
         this.senha = senha;
         this.matricula = matricula;
+        this.dataCadastro = LocalDateTime.now();
         this.perfis = Set.of(perfil);
     }
 
@@ -77,6 +70,11 @@ public class Usuario implements UserDetails {
 
     public String getMatricula() {
         return matricula;
+    }
+
+    // Um usuario sempre terá um perfil, e será apenas ele
+    public Perfil getPerfilUnico() {
+        return this.perfis.stream().findFirst().get();
     }
 
     @Override

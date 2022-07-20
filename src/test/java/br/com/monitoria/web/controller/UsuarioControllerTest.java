@@ -1,6 +1,9 @@
 package br.com.monitoria.web.controller;
 
+import br.com.monitoria.domain.Perfil;
+import br.com.monitoria.domain.PerfilEnum;
 import br.com.monitoria.domain.Usuario;
+import br.com.monitoria.repository.PerfilRepository;
 import br.com.monitoria.repository.UsuarioRepository;
 import br.com.monitoria.service.HashService;
 import br.com.monitoria.web.request.UsuarioRequest;
@@ -14,6 +17,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -31,6 +35,9 @@ class UsuarioControllerTest {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PerfilRepository perfilRepository;
 
     @Autowired
     private HashService hashService;
@@ -67,6 +74,9 @@ class UsuarioControllerTest {
 
         assertTrue(hashService.isSenhaValida("123456", usuario.getSenha()));
         assertEquals("20221370001", usuario.getMatricula());
+        assertNotNull(usuario.getAuthorities());
+        assertFalse(usuario.getAuthorities().isEmpty());
+        assertEquals(usuario.getPerfilUnico().getNome(), PerfilEnum.ALUNO);
     }
 
     @Test
@@ -94,8 +104,11 @@ class UsuarioControllerTest {
     }
 
     @Test
+    @Transactional // precisei adicionar pra que as persistencias nao dessem lazy initialization exception
     void badRequestAoTentarCriarUsuarioComEmailQueJaExiste() throws Exception {
-        Usuario usuario = new Usuario("teste@gmail.com", "123456", "20221370001");
+        Perfil perfilAluno = perfilRepository.findByNome(PerfilEnum.ALUNO).get();
+        Usuario usuario = new Usuario("teste@gmail.com", "123456", "20221370001", perfilAluno);
+        perfilAluno.addUsuario(usuario);
         usuarioRepository.save(usuario);
 
         UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370002");
