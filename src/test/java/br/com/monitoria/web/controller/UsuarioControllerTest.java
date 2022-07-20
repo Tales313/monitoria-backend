@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,24 +44,35 @@ class UsuarioControllerTest {
     @Autowired
     private HashService hashService;
 
+    private ObjectMapper objectMapper;
+
+    public UsuarioControllerTest() {
+        this.objectMapper = new ObjectMapper();
+
+        objectMapper.findAndRegisterModules();
+        // Isso eh para que o spring consiga receber os dados do tipo LocalDate pelo
+        // request do UsuarioRequest. Sem essa linha ele da erro de jackson.
+    }
+
     private ResultActions enviarPost(UsuarioRequest request) throws Exception {
         return mockMvc.perform(MockMvcRequestBuilders.post("/usuarios")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(request))
+                .content(objectMapper.writeValueAsString(request))
                 .accept(MediaType.APPLICATION_JSON));
     }
 
-    private void enviarPostEValidarMensagemDeBadRequest(UsuarioRequest request, String mensagemDeErro) throws Exception {
+    private void enviarPostEValidarRespostaDeErro(UsuarioRequest request, String mensagemDeErro, HttpStatus status) throws Exception {
         enviarPost(request)
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(status().is(status.value()))
+                .andExpect(jsonPath("$.status").value(status.value()))
+                .andExpect(jsonPath("$.error").value(status.getReasonPhrase()))
                 .andExpect(jsonPath("$.message").value(mensagemDeErro));
     }
 
     @Test
     void sucessoAoTentarCriarUsuario() throws Exception {
 
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370001");
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370001", LocalDate.of(1998, 11, 10));
 
         enviarPost(request)
             .andExpect(status().isCreated())
@@ -81,25 +94,21 @@ class UsuarioControllerTest {
 
     @Test
     void badRequestAoTentarCriarUsuarioComEmailEmBranco() throws Exception {
+        UsuarioRequest request = new UsuarioRequest("", "123456", "20221370001", LocalDate.of(1998, 11, 10));
 
-        UsuarioRequest request = new UsuarioRequest("", "123456", "20221370001");
-
-        enviarPostEValidarMensagemDeBadRequest(request, "O login não deve estar em branco");
+        enviarPostEValidarRespostaDeErro(request, "O login não deve estar em branco", HttpStatus.BAD_REQUEST);
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("");
-
         assertTrue(usuarioOptional.isEmpty());
     }
 
     @Test
     void badRequestAoTentarCriarUsuarioComEmailInvalido() throws Exception {
+        UsuarioRequest request = new UsuarioRequest("abc123", "123456", "20221370001", LocalDate.of(1998, 11, 10));
 
-        UsuarioRequest request = new UsuarioRequest("abc123", "123456", "20221370001");
-
-        enviarPostEValidarMensagemDeBadRequest(request, "deve ser um endereço de e-mail bem formado");
+        enviarPostEValidarRespostaDeErro(request, "deve ser um endereço de e-mail bem formado", HttpStatus.BAD_REQUEST);
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("abc123");
-
         assertTrue(usuarioOptional.isEmpty());
     }
 
@@ -107,13 +116,13 @@ class UsuarioControllerTest {
     @Transactional // precisei adicionar pra que as persistencias nao dessem lazy initialization exception
     void badRequestAoTentarCriarUsuarioComEmailQueJaExiste() throws Exception {
         Perfil perfilAluno = perfilRepository.findByNome(PerfilEnum.ALUNO).get();
-        Usuario usuario = new Usuario("teste@gmail.com", "123456", "20221370001", perfilAluno);
+        Usuario usuario = new Usuario("teste@gmail.com", "123456", "20221370001", LocalDate.of(1998, 10, 11), perfilAluno);
         perfilAluno.addUsuario(usuario);
         usuarioRepository.save(usuario);
 
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370002");
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370002", LocalDate.of(1998, 11, 10));
 
-        enviarPostEValidarMensagemDeBadRequest(request, "Já existe um usuário com este email");
+        enviarPostEValidarRespostaDeErro(request, "Já existe um usuário com este email", HttpStatus.BAD_REQUEST);
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
         assertTrue(usuarioOptional.isPresent());
@@ -121,58 +130,73 @@ class UsuarioControllerTest {
 
     @Test
     void badRequestAoTentarCriarUsuarioComSenhaNula() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", null, "20221370002");
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", null, "20221370002", LocalDate.of(1998, 11, 10));
 
-        enviarPostEValidarMensagemDeBadRequest(request, "A senha não deve ser nula");
+        enviarPostEValidarRespostaDeErro(request, "A senha não deve ser nula", HttpStatus.BAD_REQUEST);
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
-
         assertTrue(usuarioOptional.isEmpty());
     }
 
 
     @Test
     void badRequestAoTentarCriarUsuarioComSenhaMenorQue6Digitos() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "12345", "20221370002");
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "12345", "20221370002", LocalDate.of(1998, 11, 10));
 
-        enviarPostEValidarMensagemDeBadRequest(request, "tamanho deve ser entre 6 e 20");
+        enviarPostEValidarRespostaDeErro(request, "tamanho deve ser entre 6 e 20", HttpStatus.BAD_REQUEST);
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
-
         assertTrue(usuarioOptional.isEmpty());
     }
 
     @Test
     void badRequestAoTentarCriarUsuarioComSenhaMaiorQue20Digitos() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "abcdefghijklmnopqrstu", "20221370002");
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "abcdefghijklmnopqrstu", "20221370002", LocalDate.of(1998, 11, 10));
 
-        enviarPostEValidarMensagemDeBadRequest(request, "tamanho deve ser entre 6 e 20");
+        enviarPostEValidarRespostaDeErro(request, "tamanho deve ser entre 6 e 20", HttpStatus.BAD_REQUEST);
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
-
         assertTrue(usuarioOptional.isEmpty());
     }
 
 
     @Test
     void badRequestAoTentarCriarUsuarioComMatriculaNula() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", null);
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", null, LocalDate.of(1998, 11, 10));
 
-        enviarPostEValidarMensagemDeBadRequest(request, "A matricula não deve estar em branco");
+        enviarPostEValidarRespostaDeErro(request, "A matricula não deve estar em branco", HttpStatus.BAD_REQUEST);
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
-
         assertTrue(usuarioOptional.isEmpty());
     }
 
     @Test
     void badRequestAoTentarCriarUsuarioComMatriculaEmBranco() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "");
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "", LocalDate.of(1998, 11, 10));
 
-        enviarPostEValidarMensagemDeBadRequest(request, "A matricula não deve estar em branco");
+        enviarPostEValidarRespostaDeErro(request, "A matricula não deve estar em branco", HttpStatus.BAD_REQUEST);
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
+        assertTrue(usuarioOptional.isEmpty());
+    }
 
+    @Test
+    void badRequestAoTentarCriarUsuarioComDataNascimentoNula() throws Exception {
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370002", null);
+
+        enviarPostEValidarRespostaDeErro(request, "A data de nascimento deve ser informada", HttpStatus.BAD_REQUEST);
+
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
+        assertTrue(usuarioOptional.isEmpty());
+    }
+
+    @Test
+    void badRequestAoTentarCriarUsuarioComDataNascimentoNoFuturo() throws Exception {
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370002", LocalDate.now().plusDays(1));
+
+        enviarPostEValidarRespostaDeErro(request, "A data de nascimento não pode ser no futuro", HttpStatus.BAD_REQUEST);
+
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
         assertTrue(usuarioOptional.isEmpty());
     }
 

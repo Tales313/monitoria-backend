@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -53,7 +55,7 @@ class AutenticacaoControllerTest {
     @Transactional // precisei adicionar pra que as persistencias nao dessem lazy initialization exception
     void cadastrarUsuarioEAutenticarComSucesso() throws Exception {
         Perfil perfilAluno = perfilRepository.findByNome(PerfilEnum.ALUNO).get();
-        Usuario usuario = new Usuario("teste@gmail.com", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011", perfilAluno);
+        Usuario usuario = new Usuario("teste@gmail.com", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011", LocalDate.of(1998, 10, 11), perfilAluno);
         perfilAluno.addUsuario(usuario);
         usuarioRepository.save(usuario);
         LoginRequest loginRequest = new LoginRequest("teste@gmail.com", "123456");
