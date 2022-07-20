@@ -16,6 +16,11 @@ public class UsuarioTestUtils {
         return autenticarGenerico(loginRequest, mockMvc, objectMapper);
     }
 
+    public static String autenticarComCoordenador(ObjectMapper objectMapper, MockMvc mockMvc) throws Exception {
+        LoginRequest loginRequest = new LoginRequest("coordenador_01@gmail.com", "123456");
+        return autenticarGenerico(loginRequest, mockMvc, objectMapper);
+    }
+
     public static String autenticarComAluno(ObjectMapper objectMapper, MockMvc mockMvc) throws Exception {
         LoginRequest loginRequest = new LoginRequest("aluno_01@gmail.com", "123456");
         return autenticarGenerico(loginRequest, mockMvc, objectMapper);

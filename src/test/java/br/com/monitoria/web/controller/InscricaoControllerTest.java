@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,7 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static br.com.monitoria.testUtils.UsuarioTestUtils.autenticarComAdmin;
+import static br.com.monitoria.testUtils.UsuarioTestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -77,16 +78,17 @@ class InscricaoControllerTest {
                 .accept(MediaType.APPLICATION_JSON));
     }
 
-    private void enviarPostEValidarMensagemDeBadRequest(InscricaoRequest request, String mensagemDeErro) throws Exception {
+    private void enviarPostEValidarRespostaDeErro(InscricaoRequest request, String mensagemDeErro, HttpStatus httpStatus) throws Exception {
         enviarPost(request)
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(status().is(httpStatus.value()))
+                .andExpect(jsonPath("$.status").value(httpStatus.value()))
+                .andExpect(jsonPath("$.error").value(httpStatus.getReasonPhrase()))
                 .andExpect(jsonPath("$.message").value(mensagemDeErro));
     }
 
     @Test
     void sucessoAoCriarInscricao() throws Exception {
-
+        this.token = autenticarComAluno(objectMapper, mockMvc);
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, 1L);
 
         enviarPost(inscricaoRequest)
@@ -113,14 +115,14 @@ class InscricaoControllerTest {
         assertEquals(80.5, inscricao.getMedia());
         assertEquals(ResultadoEnum.AGUARDANDO, inscricao.getResultado());
         assertEquals(1L, inscricao.getVaga().getId());
-        assertEquals(1L, inscricao.getUsuario().getId());
+        assertEquals("aluno_01@gmail.com", inscricao.getUsuario().getLogin());
     }
 
     @Test
     void erroAoCriarInscricaoComOpcaoNula() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(null, 85.0, 70.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A opcao deve ser informada");
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "A opcao deve ser informada", HttpStatus.BAD_REQUEST);
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -130,7 +132,7 @@ class InscricaoControllerTest {
     void erroAoCriarInscricaoComOpcaoAbaixoDoRange() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(0, 85.0, 70.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A opcao deve ser 1 ou 2");
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "A opcao deve ser 1 ou 2", HttpStatus.BAD_REQUEST);
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -140,7 +142,7 @@ class InscricaoControllerTest {
     void erroAoCriarInscricaoComOpcaoAcimaDoRange() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(3, 85.0, 70.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A opcao deve ser 1 ou 2");
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "A opcao deve ser 1 ou 2", HttpStatus.BAD_REQUEST);
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -150,7 +152,7 @@ class InscricaoControllerTest {
     void erroAoCriarInscricaoComNotaDisciplinaNula() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, null, 70.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A nota da disciplina deve ser informada");
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "A nota da disciplina deve ser informada", HttpStatus.BAD_REQUEST);
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -160,7 +162,7 @@ class InscricaoControllerTest {
     void erroAoCriarInscricaoComNotaDisciplinaAbaixoDoRange() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 69.9, 70.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A nota da disciplina deve ser entre 70 e 100");
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "A nota da disciplina deve ser entre 70 e 100", HttpStatus.BAD_REQUEST);
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -170,7 +172,7 @@ class InscricaoControllerTest {
     void erroAoCriarInscricaoComNotaDisciplinaAcimaDoRange() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 101.0, 70.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "A nota da disciplina deve ser entre 70 e 100");
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "A nota da disciplina deve ser entre 70 e 100", HttpStatus.BAD_REQUEST);
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -180,7 +182,7 @@ class InscricaoControllerTest {
     void erroAoCriarInscricaoComCreNull() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, null, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "O CRE deve ser informado");
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "O CRE deve ser informado", HttpStatus.BAD_REQUEST);
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -190,7 +192,7 @@ class InscricaoControllerTest {
     void erroAoCriarInscricaoComCreAbaixoDoRange() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, -1.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "O CRE deve ser entre 0 e 100");
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "O CRE deve ser entre 0 e 100", HttpStatus.BAD_REQUEST);
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -200,7 +202,7 @@ class InscricaoControllerTest {
     void erroAoCriarInscricaoComCreAcimaDoRange() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 101.0, 1L);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "O CRE deve ser entre 0 e 100");
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "O CRE deve ser entre 0 e 100", HttpStatus.BAD_REQUEST);
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -210,7 +212,28 @@ class InscricaoControllerTest {
     void erroAoCriarInscricaoComIdVagaNula() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, null);
 
-        enviarPostEValidarMensagemDeBadRequest(inscricaoRequest, "O id da vaga deve ser informado");
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "O id da vaga deve ser informado", HttpStatus.BAD_REQUEST);
+
+        List<Inscricao> inscricoes = inscricaoRepository.findAll();
+        assertTrue(inscricoes.isEmpty());
+    }
+
+    @Test
+    void erroAoCriarInscricaoComUsuarioAdmin() throws Exception {
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, 1L);
+
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "Apenas alunos podem se inscrever para concorrer a monitoria.", HttpStatus.FORBIDDEN);
+
+        List<Inscricao> inscricoes = inscricaoRepository.findAll();
+        assertTrue(inscricoes.isEmpty());
+    }
+
+    @Test
+    void erroAoCriarInscricaoComUsuarioCoordenador() throws Exception {
+        this.token = autenticarComCoordenador(objectMapper, mockMvc);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, 1L);
+
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "Apenas alunos podem se inscrever para concorrer a monitoria.", HttpStatus.FORBIDDEN);
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
