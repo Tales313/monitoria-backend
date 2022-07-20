@@ -3,10 +3,8 @@ package br.com.monitoria.web.request;
 import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.util.validators.ValorUnico;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
+import java.time.LocalDate;
 
 public class UsuarioRequest {
 
@@ -22,10 +20,15 @@ public class UsuarioRequest {
     @NotBlank(message = "A matricula não deve estar em branco")
     private String matricula;
 
-    public UsuarioRequest(String login, String senha, String matricula) {
+    @NotNull(message = "A data de nascimento deve ser informada")
+    @Past(message = "A data de nascimento não pode ser no futuro")
+    private LocalDate dataNascimento;
+
+    public UsuarioRequest(String login, String senha, String matricula, LocalDate dataNascimento) {
         this.login = login;
         this.senha = senha;
         this.matricula = matricula;
+        this.dataNascimento = dataNascimento;
     }
 
     public String getLogin() {
@@ -38,5 +41,9 @@ public class UsuarioRequest {
 
     public String getMatricula() {
         return matricula;
+    }
+
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
     }
 }
