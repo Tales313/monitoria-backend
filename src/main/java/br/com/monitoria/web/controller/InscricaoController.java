@@ -1,7 +1,9 @@
 package br.com.monitoria.web.controller;
 
 import br.com.monitoria.domain.Inscricao;
+import br.com.monitoria.domain.PerfilEnum;
 import br.com.monitoria.domain.Usuario;
+import br.com.monitoria.exception.OperacaoNaoPermitidaException;
 import br.com.monitoria.repository.InscricaoRepository;
 import br.com.monitoria.repository.VagaRepository;
 import br.com.monitoria.util.CalculaMedia;
@@ -35,6 +37,9 @@ public class InscricaoController {
 
         // pegando usuario logado
         Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if(!usuario.getPerfilUnico().getNome().equals(PerfilEnum.ALUNO))
+            throw new OperacaoNaoPermitidaException("Apenas alunos podem se inscrever para concorrer a monitoria.");
 
         Double media = CalculaMedia.calcular(request.getNotaDisciplina(), request.getCre());
 
