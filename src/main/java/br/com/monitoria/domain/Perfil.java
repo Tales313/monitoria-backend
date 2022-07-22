@@ -4,6 +4,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -11,11 +12,12 @@ public class Perfil implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_perfil")
-    @SequenceGenerator(name = "generator_perfil", sequenceName = "sequence_id_perfil")
+    @SequenceGenerator(name = "generator_perfil", sequenceName = "sequence_id_perfil", allocationSize = 1)
     private Long id;
 
     @NotBlank(message = "Um perfil precisa ter um nome")
-    private String nome;
+    @Enumerated(EnumType.STRING)
+    private PerfilEnum nome;
 
     @ManyToMany
     @JoinTable(name = "usuarios_perfis",
@@ -23,25 +25,24 @@ public class Perfil implements GrantedAuthority {
                inverseJoinColumns = @JoinColumn(name = "usuario_id"))
     private Set<Usuario> usuarios;
 
+    public Perfil() {
+    }
+
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNome() {
+    public PerfilEnum getNome() {
         return nome;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void addUsuario(Usuario usuario) {
+        this.usuarios.add(usuario);
     }
 
     @Override
     public String getAuthority() {
-        return this.nome;
+        return this.nome.toString();
     }
 
 }

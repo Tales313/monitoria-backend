@@ -1,7 +1,9 @@
 package br.com.monitoria.web.exceptionhandler;
 
 import br.com.monitoria.exception.DataInscricoesException;
+import br.com.monitoria.exception.InscricaoException;
 import br.com.monitoria.exception.NotFoundException;
+import br.com.monitoria.exception.OperacaoNegadaException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -63,6 +65,24 @@ public class ControllerAdvice {
         return new ErrorMessage(
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ex.getMessage());
+    }
+
+    @ExceptionHandler(OperacaoNegadaException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorMessage handleOperacaoNaoPermitidaException(OperacaoNegadaException ex) {
+        return new ErrorMessage(
+                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN.getReasonPhrase(),
+                ex.getMessage());
+    }
+
+    @ExceptionHandler(InscricaoException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ErrorMessage handleInscricaoException(InscricaoException ex) {
+        return new ErrorMessage(
+                HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase(),
                 ex.getMessage());
     }
 

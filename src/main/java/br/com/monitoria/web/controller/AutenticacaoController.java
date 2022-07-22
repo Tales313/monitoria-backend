@@ -2,6 +2,7 @@ package br.com.monitoria.web.controller;
 
 import br.com.monitoria.security.TokenService;
 import br.com.monitoria.service.HashService;
+import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.LoginRequest;
 import br.com.monitoria.web.response.LoginResponse;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping(Paths.AUTH)
 public class AutenticacaoController {
 
     private AuthenticationManager authenticationManager;

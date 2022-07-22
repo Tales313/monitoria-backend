@@ -1,11 +1,11 @@
 package br.com.monitoria.web.controller;
 
+import br.com.monitoria.domain.Perfil;
+import br.com.monitoria.domain.PerfilEnum;
 import br.com.monitoria.domain.Usuario;
+import br.com.monitoria.repository.PerfilRepository;
 import br.com.monitoria.repository.UsuarioRepository;
-import br.com.monitoria.web.request.EditalRequest;
 import br.com.monitoria.web.request.LoginRequest;
-import br.com.monitoria.web.request.UsuarioRequest;
-import br.com.monitoria.web.response.LoginResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +14,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.LocalDate;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,6 +33,9 @@ class AutenticacaoControllerTest {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PerfilRepository perfilRepository;
 
     private ObjectMapper objectMapper;
     
@@ -48,8 +52,11 @@ class AutenticacaoControllerTest {
     }
 
     @Test
-    void cadastrarUsuarioEAutenticarComSucesso() throws Exception {
-        Usuario usuario = new Usuario("teste@gmail.com", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011");
+    @Transactional // precisei adicionar pra que as persistencias nao dessem lazy initialization exception
+    void sucessoAoAutenticar() throws Exception {
+        Perfil perfilAluno = perfilRepository.findByNome(PerfilEnum.ALUNO).get();
+        Usuario usuario = new Usuario("teste@gmail.com", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011", LocalDate.of(1998, 10, 11), perfilAluno);
+        perfilAluno.addUsuario(usuario);
         usuarioRepository.save(usuario);
         LoginRequest loginRequest = new LoginRequest("teste@gmail.com", "123456");
 
@@ -60,7 +67,7 @@ class AutenticacaoControllerTest {
     }
 
     @Test
-    void naoCadastrarUsuarioEAutenticarComFalha() throws Exception {
+    void badRequestAoAutenticarComUsuarioInexistente() throws Exception {
         LoginRequest loginRequest = new LoginRequest("teste@gmail.com", "123456");
 
         enviarPost(loginRequest).andExpect(status().isBadRequest());
