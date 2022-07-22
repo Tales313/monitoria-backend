@@ -113,7 +113,7 @@ class VagaControllerTest {
     }
 
     @Test
-    void erroAoCriarVagaComDisciplinaEmBranco() throws Exception {
+    void badRequestAoCriarVagaComDisciplinaEmBranco() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("", "2", 2, edital.getId());
 
         enviarPostEValidarRespostaDeErro(vagaRequest, "A disciplina deve ser informada", HttpStatus.BAD_REQUEST);
@@ -123,7 +123,7 @@ class VagaControllerTest {
     }
 
     @Test
-    void erroAoCriarVagaComPeriodoEmBranco() throws Exception {
+    void badRequestAoCriarVagaComPeriodoEmBranco() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "", 2, edital.getId());
 
         enviarPostEValidarRespostaDeErro(vagaRequest, "O periodo deve ser informado", HttpStatus.BAD_REQUEST);
@@ -133,7 +133,7 @@ class VagaControllerTest {
     }
 
     @Test
-    void erroAoCriarVagaComQuantidadeNula() throws Exception {
+    void badRequestAoCriarVagaComQuantidadeNula() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", null, edital.getId());
 
         enviarPostEValidarRespostaDeErro(vagaRequest, "A quantidade deve ser informada", HttpStatus.BAD_REQUEST);
@@ -143,7 +143,7 @@ class VagaControllerTest {
     }
 
     @Test
-    void erroAoCriarVagaComQuantidadeZero() throws Exception {
+    void badRequestAoCriarVagaComQuantidadeZero() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 0, edital.getId());
 
         enviarPostEValidarRespostaDeErro(vagaRequest, "A quantidade deve ter valor positivo", HttpStatus.BAD_REQUEST);
@@ -153,7 +153,7 @@ class VagaControllerTest {
     }
 
     @Test
-    void erroAoCriarVagaComIdEditalNull() throws Exception {
+    void badRequestAoCriarVagaComIdEditalNull() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 2, null);
 
         enviarPostEValidarRespostaDeErro(vagaRequest, "O id do edital deve ser informado", HttpStatus.BAD_REQUEST);
@@ -163,7 +163,7 @@ class VagaControllerTest {
     }
 
     @Test
-    void erroAoCriarVagaComIdEditalInexistente() throws Exception {
+    void badRequestAoCriarVagaComIdEditalInexistente() throws Exception {
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 2, 2L);
 
         enviarPostEValidarRespostaDeErro(vagaRequest, "Edital não encontrado", HttpStatus.BAD_REQUEST);
@@ -173,7 +173,7 @@ class VagaControllerTest {
     }
 
     @Test
-    void erroAoCriarVagaComTokenDeUsuarioAluno() throws Exception {
+    void forbiddenAoCriarVagaComTokenDeUsuarioAluno() throws Exception {
         this.token = autenticarComAluno(objectMapper, mockMvc);
 
         VagaRequest vagaRequest = new VagaRequest("Javascript", "2", 2, edital.getId());

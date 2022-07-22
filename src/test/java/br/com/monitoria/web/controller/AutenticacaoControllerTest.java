@@ -53,7 +53,7 @@ class AutenticacaoControllerTest {
 
     @Test
     @Transactional // precisei adicionar pra que as persistencias nao dessem lazy initialization exception
-    void cadastrarUsuarioEAutenticarComSucesso() throws Exception {
+    void sucessoAoAutenticar() throws Exception {
         Perfil perfilAluno = perfilRepository.findByNome(PerfilEnum.ALUNO).get();
         Usuario usuario = new Usuario("teste@gmail.com", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011", LocalDate.of(1998, 10, 11), perfilAluno);
         perfilAluno.addUsuario(usuario);
@@ -67,7 +67,7 @@ class AutenticacaoControllerTest {
     }
 
     @Test
-    void naoCadastrarUsuarioEAutenticarComFalha() throws Exception {
+    void badRequestAoAutenticarComUsuarioInexistente() throws Exception {
         LoginRequest loginRequest = new LoginRequest("teste@gmail.com", "123456");
 
         enviarPost(loginRequest).andExpect(status().isBadRequest());

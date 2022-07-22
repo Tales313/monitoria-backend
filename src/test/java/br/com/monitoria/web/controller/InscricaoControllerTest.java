@@ -126,7 +126,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void erroAoCriarInscricaoComOpcaoNula() throws Exception {
+    void badRequestAoCriarInscricaoComOpcaoNula() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(null, 85.0, 70.0, 1L);
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, "A opcao deve ser informada", HttpStatus.BAD_REQUEST);
@@ -136,7 +136,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void erroAoCriarInscricaoComOpcaoAbaixoDoRange() throws Exception {
+    void badRequestAoCriarInscricaoComOpcaoAbaixoDoRange() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(0, 85.0, 70.0, 1L);
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, "A opcao deve ser 1 ou 2", HttpStatus.BAD_REQUEST);
@@ -146,7 +146,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void erroAoCriarInscricaoComOpcaoAcimaDoRange() throws Exception {
+    void badRequestAoCriarInscricaoComOpcaoAcimaDoRange() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(3, 85.0, 70.0, 1L);
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, "A opcao deve ser 1 ou 2", HttpStatus.BAD_REQUEST);
@@ -156,7 +156,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void erroAoCriarInscricaoComNotaDisciplinaNula() throws Exception {
+    void badRequestAoCriarInscricaoComNotaDisciplinaNula() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, null, 70.0, 1L);
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, "A nota da disciplina deve ser informada", HttpStatus.BAD_REQUEST);
@@ -166,7 +166,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void erroAoCriarInscricaoComNotaDisciplinaAbaixoDoRange() throws Exception {
+    void badRequestAoCriarInscricaoComNotaDisciplinaAbaixoDoRange() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 69.9, 70.0, 1L);
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, "A nota da disciplina deve ser entre 70 e 100", HttpStatus.BAD_REQUEST);
@@ -176,7 +176,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void erroAoCriarInscricaoComNotaDisciplinaAcimaDoRange() throws Exception {
+    void badRequestAoCriarInscricaoComNotaDisciplinaAcimaDoRange() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 101.0, 70.0, 1L);
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, "A nota da disciplina deve ser entre 70 e 100", HttpStatus.BAD_REQUEST);
@@ -186,7 +186,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void erroAoCriarInscricaoComCreNull() throws Exception {
+    void badRequestAoCriarInscricaoComCreNull() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, null, 1L);
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, "O CRE deve ser informado", HttpStatus.BAD_REQUEST);
@@ -196,7 +196,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void erroAoCriarInscricaoComCreAbaixoDoRange() throws Exception {
+    void badRequestAoCriarInscricaoComCreAbaixoDoRange() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, -1.0, 1L);
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, "O CRE deve ser entre 0 e 100", HttpStatus.BAD_REQUEST);
@@ -206,7 +206,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void erroAoCriarInscricaoComCreAcimaDoRange() throws Exception {
+    void badRequestAoCriarInscricaoComCreAcimaDoRange() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 101.0, 1L);
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, "O CRE deve ser entre 0 e 100", HttpStatus.BAD_REQUEST);
@@ -216,7 +216,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void erroAoCriarInscricaoComIdVagaNula() throws Exception {
+    void badRequestAoCriarInscricaoComIdVagaNula() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, null);
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, "O id da vaga deve ser informado", HttpStatus.BAD_REQUEST);
@@ -226,7 +226,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void erroAoCriarInscricaoComUsuarioAdmin() throws Exception {
+    void forbiddenAoCriarInscricaoComUsuarioAdmin() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, 1L);
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, "Apenas alunos podem se inscrever para concorrer a monitoria.", HttpStatus.FORBIDDEN);
@@ -236,7 +236,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void erroAoCriarInscricaoComUsuarioCoordenador() throws Exception {
+    void forbiddenAoCriarInscricaoComUsuarioCoordenador() throws Exception {
         this.token = autenticarComCoordenador(objectMapper, mockMvc);
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, 1L);
 
@@ -247,7 +247,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void unprocessableEntityAoTentarCriarPrimeiraInscricaoComOpcao2() throws Exception {
+    void unprocessableEntityAoCriarPrimeiraInscricaoComOpcao2() throws Exception {
         this.token = autenticarComAluno(objectMapper, mockMvc);
         InscricaoRequest inscricaoRequest = new InscricaoRequest(2, 85.0, 70.0, 1L);
 
@@ -258,7 +258,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void unprocessableEntityAoTentarCriarSegundaInscricaoComOpcao1() throws Exception {
+    void unprocessableEntityAoCriarSegundaInscricaoComOpcao1() throws Exception {
         this.token = autenticarComAluno(objectMapper, mockMvc);
         this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
         Inscricao inscricaoOpcao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
@@ -274,7 +274,7 @@ class InscricaoControllerTest {
     }
 
     @Test
-    void unprocessableEntityAoTentarCriarMaisQueDuasInscricoes() throws Exception {
+    void unprocessableEntityAoCriarMaisQueDuasInscricoes() throws Exception {
         this.token = autenticarComAluno(objectMapper, mockMvc);
         this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
         Inscricao inscricaoOpcao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
