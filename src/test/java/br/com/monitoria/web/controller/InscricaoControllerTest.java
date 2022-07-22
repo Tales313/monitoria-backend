@@ -53,7 +53,9 @@ class InscricaoControllerTest {
 
     private Edital edital;
 
-    private Vaga vaga;
+    private Vaga vaga1;
+    private Vaga vaga2;
+    private Vaga vaga3;
 
     public InscricaoControllerTest() {
         this.objectMapper = new ObjectMapper();
@@ -65,8 +67,12 @@ class InscricaoControllerTest {
         this.usuario = usuarioRepository.findByLogin("admin@gmail.com").get();
         this.edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
         editalRepository.save(edital);
-        this.vaga = new Vaga("Javascript", "2", 2, edital, usuario);
-        vagaRepository.save(vaga);
+        this.vaga1 = new Vaga("Javascript", "2", 2, edital, usuario);
+        this.vaga2 = new Vaga("Programacao orientada a objetos", "3", 1, edital, usuario);
+        this.vaga3 = new Vaga("Programacao para web I", "4", 1, edital, usuario);
+        vagaRepository.save(vaga1);
+        vagaRepository.save(vaga2);
+        vagaRepository.save(vaga3);
     }
 
     private ResultActions enviarPost(InscricaoRequest request) throws Exception {
@@ -237,6 +243,48 @@ class InscricaoControllerTest {
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
+    }
+
+    @Test
+    void unprocessableEntityAoTentarCriarPrimeiraInscricaoComOpcao2() throws Exception {
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(2, 85.0, 70.0, 1L);
+
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "Sua primeira inscrição deve ser a opção 1", HttpStatus.UNPROCESSABLE_ENTITY);
+
+        List<Inscricao> inscricoes = inscricaoRepository.findAll();
+        assertTrue(inscricoes.isEmpty());
+    }
+
+    @Test
+    void unprocessableEntityAoTentarCriarSegundaInscricaoComOpcao1() throws Exception {
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
+        Inscricao inscricaoOpcao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
+        inscricaoOpcao1 = inscricaoRepository.save(inscricaoOpcao1);
+
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, 1L);
+
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "Sua segunda inscrição deve ser a opção 2", HttpStatus.UNPROCESSABLE_ENTITY);
+
+        List<Inscricao> inscricoes = inscricaoRepository.findAll();
+        assertEquals(1, inscricoes.size());
+        assertEquals(1, inscricoes.get(0).getOpcao());
+    }
+
+    @Test
+    void unprocessableEntityAoTentarCriarMaisQueDuasInscricoes() throws Exception {
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
+        Inscricao inscricaoOpcao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
+        inscricaoOpcao1 = inscricaoRepository.save(inscricaoOpcao1);
+
+        Inscricao inscricaoOpcao2 = new Inscricao(2, 85.0, 75.0, 78.5, vaga2, usuario);
+        inscricaoOpcao2 = inscricaoRepository.save(inscricaoOpcao2);
+
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(2, 85.0, 70.0, 3L);
+
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "Você não pode ter mais que duas inscrições", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
 }
