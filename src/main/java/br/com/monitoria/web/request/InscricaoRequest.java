@@ -3,8 +3,6 @@ package br.com.monitoria.web.request;
 import br.com.monitoria.domain.Inscricao;
 import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.domain.Vaga;
-import br.com.monitoria.exception.NotFoundException;
-import br.com.monitoria.repository.VagaRepository;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
@@ -33,11 +31,7 @@ public class InscricaoRequest {
         this.idVaga = idVaga;
     }
 
-    public Inscricao toModel(VagaRepository vagaRepository, Double media, Usuario usuario) {
-
-        Vaga vaga = vagaRepository.findById(idVaga).orElseThrow(
-                () -> new NotFoundException("Vaga não encontrada"));
-
+    public Inscricao toModel(Vaga vaga, Double media, Usuario usuario) {
         return new Inscricao(opcao, notaDisciplina, cre, media, vaga, usuario);
     }
 
