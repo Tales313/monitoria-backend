@@ -6,6 +6,7 @@ import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.repository.PerfilRepository;
 import br.com.monitoria.repository.UsuarioRepository;
 import br.com.monitoria.service.HashService;
+import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.UsuarioRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,7 @@ class UsuarioControllerTest {
     }
 
     private ResultActions enviarPost(UsuarioRequest request) throws Exception {
-        return mockMvc.perform(MockMvcRequestBuilders.post("/usuarios")
+        return mockMvc.perform(MockMvcRequestBuilders.post(Paths.USUARIOS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .accept(MediaType.APPLICATION_JSON));

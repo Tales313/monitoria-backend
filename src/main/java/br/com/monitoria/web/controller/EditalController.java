@@ -5,6 +5,7 @@ import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.exception.DataInscricoesException;
 import br.com.monitoria.exception.NotFoundException;
 import br.com.monitoria.repository.EditalRepository;
+import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.EditalRequest;
 import br.com.monitoria.web.response.EditalResponse;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/editais")
+@RequestMapping(Paths.EDITAIS)
 public class EditalController {
 
     private EditalRepository editalRepository;

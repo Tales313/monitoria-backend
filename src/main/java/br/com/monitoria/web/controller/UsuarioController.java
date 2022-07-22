@@ -6,6 +6,7 @@ import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.repository.PerfilRepository;
 import br.com.monitoria.repository.UsuarioRepository;
 import br.com.monitoria.service.HashService;
+import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.UsuarioRequest;
 import br.com.monitoria.web.response.UsuarioResponse;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping(Paths.USUARIOS)
 public class UsuarioController {
 
     private UsuarioRepository usuarioRepository;
