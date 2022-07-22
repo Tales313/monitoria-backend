@@ -2,6 +2,7 @@ package br.com.monitoria.web.controller;
 
 import br.com.monitoria.domain.*;
 import br.com.monitoria.repository.*;
+import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.InscricaoRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,7 +78,7 @@ class InscricaoControllerTest {
 
     private ResultActions enviarPost(InscricaoRequest request) throws Exception {
 
-        return mockMvc.perform(MockMvcRequestBuilders.post("/inscricoes")
+        return mockMvc.perform(MockMvcRequestBuilders.post(Paths.INSCRICOES)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .header("Authorization", "Bearer " + token)

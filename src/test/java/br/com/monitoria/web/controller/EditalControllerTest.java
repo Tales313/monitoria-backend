@@ -4,6 +4,7 @@ import br.com.monitoria.domain.Edital;
 import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.repository.EditalRepository;
 import br.com.monitoria.repository.UsuarioRepository;
+import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.EditalRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +66,7 @@ class EditalControllerTest {
 
     private ResultActions enviarPost(EditalRequest request) throws Exception {
 
-        return mockMvc.perform(MockMvcRequestBuilders.post("/editais")
+        return mockMvc.perform(MockMvcRequestBuilders.post(Paths.EDITAIS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .header("Authorization", "Bearer " + token)
@@ -82,7 +83,7 @@ class EditalControllerTest {
 
     private ResultActions enviarGet(Long id) throws Exception {
 
-        return mockMvc.perform(MockMvcRequestBuilders.get("/editais/" + id)
+        return mockMvc.perform(MockMvcRequestBuilders.get(Paths.EDITAIS + "/" + id)
                 .header("Authorization", "Bearer " + token)
                 .accept(MediaType.APPLICATION_JSON));
     }

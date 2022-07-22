@@ -6,6 +6,7 @@ import br.com.monitoria.domain.Vaga;
 import br.com.monitoria.repository.EditalRepository;
 import br.com.monitoria.repository.UsuarioRepository;
 import br.com.monitoria.repository.VagaRepository;
+import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.VagaRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,7 +71,7 @@ class VagaControllerTest {
 
     private ResultActions enviarPost(VagaRequest request) throws Exception {
 
-        return mockMvc.perform(MockMvcRequestBuilders.post("/vagas")
+        return mockMvc.perform(MockMvcRequestBuilders.post(Paths.VAGAS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .header("Authorization", "Bearer " + token)

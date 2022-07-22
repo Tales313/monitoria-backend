@@ -8,6 +8,7 @@ import br.com.monitoria.repository.InscricaoRepository;
 import br.com.monitoria.repository.VagaRepository;
 import br.com.monitoria.service.InscricaoService;
 import br.com.monitoria.util.CalculaMedia;
+import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.InscricaoRequest;
 import br.com.monitoria.web.response.InscricaoResponse;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/inscricoes")
+@RequestMapping(Paths.INSCRICOES)
 public class InscricaoController {
 
     private InscricaoRepository inscricaoRepository;
