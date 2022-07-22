@@ -89,7 +89,7 @@ class EditalControllerTest {
     }
 
     @Test
-    void sucessoAoTentarCriarEdital() throws Exception {
+    void sucessoAoCriarEdital() throws Exception {
 
         EditalRequest editalRequest = new EditalRequest("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
 
@@ -114,7 +114,7 @@ class EditalControllerTest {
     }
 
     @Test
-    void erroAoCriarEditalComSemestreNulo() throws Exception {
+    void badRequestAoCriarEditalComSemestreNulo() throws Exception {
         EditalRequest editalRequest = new EditalRequest(null, LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
 
         enviarPostEValidarRespostaDeErro(editalRequest, "O semestre deve ser informado", HttpStatus.BAD_REQUEST);
@@ -124,7 +124,7 @@ class EditalControllerTest {
     }
 
     @Test
-    void erroAoCriarEditalComSemestreEmBranco() throws Exception {
+    void badRequestAoCriarEditalComSemestreEmBranco() throws Exception {
         EditalRequest editalRequest = new EditalRequest("", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
 
         enviarPostEValidarRespostaDeErro(editalRequest, "O semestre deve ter o formato 2022.1", HttpStatus.BAD_REQUEST);
@@ -134,7 +134,7 @@ class EditalControllerTest {
     }
 
     @Test
-    void erroAoCriarEditalComSemestreInvalido() throws Exception {
+    void badRequestAoCriarEditalComSemestreInvalido() throws Exception {
         EditalRequest editalRequest = new EditalRequest("123.4", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
 
         enviarPostEValidarRespostaDeErro(editalRequest, "O semestre deve ter o formato 2022.1", HttpStatus.BAD_REQUEST);
@@ -144,7 +144,7 @@ class EditalControllerTest {
     }
 
     @Test
-    void erroAoCriarEditalComInicioInscricoesNula() throws Exception {
+    void badRequestAoCriarEditalComInicioInscricoesNula() throws Exception {
         EditalRequest editalRequest = new EditalRequest("2022.1", null, LocalDate.of(2022, 7, 15));
 
         enviarPostEValidarRespostaDeErro(editalRequest, "A data de inicio das incrições deve ser informada", HttpStatus.BAD_REQUEST);
@@ -154,7 +154,7 @@ class EditalControllerTest {
     }
 
     @Test
-    void erroAoCriarEditalComFimInscricoesNula() throws Exception {
+    void badRequestAoCriarEditalComFimInscricoesNula() throws Exception {
         EditalRequest editalRequest = new EditalRequest("2022.1", LocalDate.of(2022, 7, 1), null);
 
         enviarPostEValidarRespostaDeErro(editalRequest, "A data de fim das inscrições deve ser informada", HttpStatus.BAD_REQUEST);
@@ -164,7 +164,7 @@ class EditalControllerTest {
     }
 
     @Test
-    void erroAoCriarEditalComDataInicioInscricoesAposDataFimInscricoes() throws Exception {
+    void badRequestAoCriarEditalComDataInicioInscricoesAposDataFimInscricoes() throws Exception {
         EditalRequest editalRequest = new EditalRequest("2022.1", LocalDate.of(2022, 7, 15), LocalDate.of(2022, 7, 1));
 
         enviarPostEValidarRespostaDeErro(editalRequest, "A data de início das inscrições deve ser antes da data de fim das incrições", HttpStatus.BAD_REQUEST);
@@ -174,7 +174,18 @@ class EditalControllerTest {
     }
 
     @Test
-    void buscarEditalComSucesso() throws Exception {
+    void forbiddenAoCriarEditalComTokenDeUsuarioAluno() throws Exception {
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+
+        EditalRequest editalRequest = new EditalRequest("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
+        enviarPostEValidarRespostaDeErro(editalRequest, "Você não tem autorização para executar essa ação.", HttpStatus.FORBIDDEN);
+
+        List<Edital> editais = editalRepository.findAll();
+        assertTrue(editais.isEmpty());
+    }
+
+    @Test
+    void sucessoAoBuscarEdital() throws Exception {
         Edital edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
         edital = editalRepository.save(edital);
 
@@ -187,23 +198,12 @@ class EditalControllerTest {
     }
 
     @Test
-    void erroAoBuscarEditalNaoExistente() throws Exception {
+    void badRequestAoBuscarEditalNaoExistente() throws Exception {
 
         enviarGet(1L)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Bad Request"))
                 .andExpect(jsonPath("$.message").value("Edital não encontrado"));
-    }
-
-    @Test
-    void erroAoCriarEditalComTokenDeUsuarioAluno() throws Exception {
-        this.token = autenticarComAluno(objectMapper, mockMvc);
-
-        EditalRequest editalRequest = new EditalRequest("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
-        enviarPostEValidarRespostaDeErro(editalRequest, "Você não tem autorização para executar essa ação.", HttpStatus.FORBIDDEN);
-
-        List<Edital> editais = editalRepository.findAll();
-        assertTrue(editais.isEmpty());
     }
 
 }
