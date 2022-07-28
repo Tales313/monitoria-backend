@@ -13,5 +13,5 @@ spring:
     password: 123
 
 jwt:
-  expiration: 86400000
+  expiration: 86400000 # 24 horas
   secret: jwt-dev-secret

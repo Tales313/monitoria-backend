@@ -25,6 +25,13 @@ public class VagaRequest {
     @NotNull(message = "O id do edital deve ser informado")
     private Long editalId;
 
+    public VagaRequest(String disciplina, String periodo, Integer quantidade, Long editalId) {
+        this.disciplina = disciplina;
+        this.periodo = periodo;
+        this.quantidade = quantidade;
+        this.editalId = editalId;
+    }
+
     public Vaga toModel(EditalRepository editalRepository, Usuario usuario) {
         Edital edital = editalRepository.findById(editalId).orElseThrow(
                 () -> new NotFoundException("Edital não encontrado"));

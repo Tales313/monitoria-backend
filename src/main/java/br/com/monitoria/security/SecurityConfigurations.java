@@ -1,6 +1,8 @@
 package br.com.monitoria.security;
 
+import br.com.monitoria.domain.PerfilEnum;
 import br.com.monitoria.repository.UsuarioRepository;
+import br.com.monitoria.util.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
@@ -46,19 +49,33 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
     // Configs de autorizacao
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/auth").permitAll()
-                .antMatchers(HttpMethod.POST, "/usuarios").permitAll()
-                .anyRequest().authenticated() // qualquer outra url deve estar autenticado para acessar
-                .and().csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // nao criar sessao
-                .and().addFilterBefore(new AutenticacaoViaTokenFilter(tokenService, usuarioRepository), UsernamePasswordAuthenticationFilter.class);
+
+        http
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // nao criar sessao
+            .and()
+            .csrf().disable()
+            .authorizeRequests()
+
+            .antMatchers(HttpMethod.POST, Paths.AUTH).permitAll()
+            .antMatchers(HttpMethod.POST, Paths.USUARIOS).permitAll()
+            .antMatchers(HttpMethod.POST, Paths.EDITAIS).hasAnyAuthority(PerfilEnum.ADMIN.toString(), PerfilEnum.COORDENADOR.toString())
+            .antMatchers(HttpMethod.POST, Paths.VAGAS).hasAnyAuthority(PerfilEnum.ADMIN.toString(), PerfilEnum.COORDENADOR.toString())
+
+            .anyRequest().authenticated() // qualquer outra url deve estar autenticado para acessar
+            .and().exceptionHandling().accessDeniedHandler(accessDeniedHandler())
+            .and().addFilterBefore(new AutenticacaoViaTokenFilter(tokenService, usuarioRepository), UsernamePasswordAuthenticationFilter.class);
     }
 
     // Configs de recursos estaticos(css, js, imgs..)
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/**.html", "/v2/api-docs", "/webjars/**", "/configuration/**", "/swagger-resources/**");
+    }
+
+    // esse handler será chamado quando o spring subir uma excecao de access denied
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
     }
 
 }

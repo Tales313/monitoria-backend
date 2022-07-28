@@ -10,7 +10,7 @@ public class Vaga {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_vaga")
-    @SequenceGenerator(name = "generator_vaga", sequenceName = "sequence_id_vaga")
+    @SequenceGenerator(name = "generator_vaga", sequenceName = "sequence_id_vaga", allocationSize = 1)
     private Long id;
 
     @NotBlank(message = "A disciplina deve ser informada")

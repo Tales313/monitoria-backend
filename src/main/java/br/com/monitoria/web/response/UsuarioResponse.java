@@ -1,6 +1,6 @@
 package br.com.monitoria.web.response;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class UsuarioResponse {
 
@@ -8,9 +8,12 @@ public class UsuarioResponse {
 
     private String matricula;
 
-    public UsuarioResponse(String login, String matricula) {
+    private LocalDate dataNascimento;
+
+    public UsuarioResponse(String login, String matricula, LocalDate dataNascimento) {
         this.login = login;
         this.matricula = matricula;
+        this.dataNascimento = dataNascimento;
     }
 
     public String getLogin() {
@@ -19,5 +22,9 @@ public class UsuarioResponse {
 
     public String getMatricula() {
         return matricula;
+    }
+
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
     }
 }

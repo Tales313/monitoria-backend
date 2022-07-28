@@ -4,6 +4,7 @@ import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.domain.Vaga;
 import br.com.monitoria.repository.EditalRepository;
 import br.com.monitoria.repository.VagaRepository;
+import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.VagaRequest;
 import br.com.monitoria.web.response.VagaResponse;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/vagas")
+@RequestMapping(Paths.VAGAS)
 public class VagaController {
 
     private VagaRepository vagaRepository;
