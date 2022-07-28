@@ -9,6 +9,6 @@ public interface EditalRepository extends JpaRepository<Edital, Long> {
 
     Optional<Edital> findBySemestre(String semestre);
 
-
+    Optional<Edital> findTopByOrderByIdDesc();
 
 }

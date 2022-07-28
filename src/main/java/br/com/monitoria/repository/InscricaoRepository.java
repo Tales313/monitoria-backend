@@ -9,4 +9,8 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, Long> {
 
     List<Inscricao> findByUsuarioIdAndVagaEditalId(Long usuarioId, Long EditalId);
 
+    List<Inscricao> findByVagaIdAndOpcaoOrderByMediaDescNotaDisciplinaDescCreDescUsuarioDataNascimentoAsc(Long vagaId, Integer opcao);
+
+    List<Inscricao> findAllByOrderById();
+
 }
