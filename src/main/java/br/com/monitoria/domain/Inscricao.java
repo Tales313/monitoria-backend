@@ -88,6 +88,10 @@ public class Inscricao {
         return media;
     }
 
+    public void setResultado(ResultadoEnum resultado) {
+        this.resultado = resultado;
+    }
+
     public ResultadoEnum getResultado() {
         return resultado;
     }

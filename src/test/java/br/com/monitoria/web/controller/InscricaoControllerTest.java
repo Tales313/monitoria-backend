@@ -66,7 +66,7 @@ class InscricaoControllerTest {
     public void setUp() throws Exception {
         this.token = autenticarComAdmin(objectMapper, mockMvc);
         this.usuario = usuarioRepository.findByLogin("admin@gmail.com").get();
-        this.edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
+        this.edital = new Edital("2022.2", LocalDate.now(), LocalDate.now().plusDays(14), usuario);
         editalRepository.save(edital);
         this.vaga1 = new Vaga("Javascript", "2", 2, edital, usuario);
         this.vaga2 = new Vaga("Programacao orientada a objetos", "3", 1, edital, usuario);
@@ -286,6 +286,52 @@ class InscricaoControllerTest {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(2, 85.0, 70.0, 3L);
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, "Você não pode ter mais que duas inscrições", HttpStatus.UNPROCESSABLE_ENTITY);
+
+        List<Inscricao> inscricoes = inscricaoRepository.findAll();
+        assertEquals(2, inscricoes.size());
     }
 
+    @Test
+    void unprocessableEntityAoCriarInscricaoAntesDaDataDeInicioDoEdital() throws Exception {
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
+
+        vagaRepository.deleteAll();
+        editalRepository.deleteAll();
+
+        edital = new Edital("2022.2", LocalDate.now().plusDays(1), LocalDate.now().plusDays(14), usuario);
+        edital = editalRepository.save(edital);
+
+        vaga1 = new Vaga("Javascript", "2", 2, edital, usuario);
+        vaga1 = vagaRepository.save(vaga1);
+
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, vaga1.getId());
+
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "O edital 2022.2 ainda não está aberto", HttpStatus.UNPROCESSABLE_ENTITY);
+
+        List<Inscricao> inscricoes = inscricaoRepository.findAll();
+        assertTrue(inscricoes.isEmpty());
+    }
+
+    @Test
+    void unprocessableEntityAoCriarInscricaoDepoisDaDataDeFimDoEdital() throws Exception {
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
+
+        vagaRepository.deleteAll();
+        editalRepository.deleteAll();
+
+        edital = new Edital("2022.2", LocalDate.now().minusDays(14), LocalDate.now().minusDays(1), usuario);
+        edital = editalRepository.save(edital);
+
+        vaga1 = new Vaga("Javascript", "2", 2, edital, usuario);
+        vaga1 = vagaRepository.save(vaga1);
+
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, vaga1.getId());
+
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "O edital 2022.2 já está fechado", HttpStatus.UNPROCESSABLE_ENTITY);
+
+        List<Inscricao> inscricoes = inscricaoRepository.findAll();
+        assertTrue(inscricoes.isEmpty());
+    }
 }
