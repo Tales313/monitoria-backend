@@ -43,13 +43,9 @@ public class AutenticacaoController {
     public ResponseEntity<?> autenticar(@RequestBody @Valid LoginRequest request) {
         UsernamePasswordAuthenticationToken login = request.converter();
         request.setSenha(hashService.hash(request.getSenha()));
-        try {
-            Authentication authentication = authenticationManager.authenticate(login);
-            String token = tokenService.gerarToken(authentication);
-            return ResponseEntity.ok(new LoginResponse(token, "Bearer"));
-        } catch (AuthenticationException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        Authentication authentication = authenticationManager.authenticate(login);
+        String token = tokenService.gerarToken(authentication);
+        return ResponseEntity.ok(new LoginResponse(token, "Bearer"));
     }
 
 }
