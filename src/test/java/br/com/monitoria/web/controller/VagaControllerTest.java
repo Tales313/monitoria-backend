@@ -22,14 +22,14 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static br.com.monitoria.testUtils.UsuarioTestUtils.autenticarComAdmin;
 import static br.com.monitoria.testUtils.UsuarioTestUtils.autenticarComAluno;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @AutoConfigureMockMvc
@@ -80,6 +80,22 @@ class VagaControllerTest {
 
     private void enviarPostEValidarRespostaDeErro(VagaRequest request, String mensagemDeErro, HttpStatus status) throws Exception {
         enviarPost(request)
+                .andExpect(status().is(status.value()))
+                .andExpect(jsonPath("$.status").value(status.value()))
+                .andExpect(jsonPath("$.error").value(status.getReasonPhrase()))
+                .andExpect(jsonPath("$.message").value(mensagemDeErro));
+    }
+
+    private ResultActions enviarGetPorEditalId(Long idEdital) throws Exception {
+
+        return mockMvc.perform(MockMvcRequestBuilders.get(Paths.VAGAS + "/" + idEdital)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + token)
+                .accept(MediaType.APPLICATION_JSON));
+    }
+
+    private ResultActions enviarGetPorEditalIdEValidarRespostaDeErro(Long idEdital, String mensagemDeErro, HttpStatus status) throws Exception {
+        return enviarGetPorEditalId(idEdital)
                 .andExpect(status().is(status.value()))
                 .andExpect(jsonPath("$.status").value(status.value()))
                 .andExpect(jsonPath("$.error").value(status.getReasonPhrase()))
@@ -182,4 +198,38 @@ class VagaControllerTest {
         List<Vaga> vagas = vagaRepository.findAll();
         assertTrue(vagas.isEmpty());
     }
+
+    @Test
+    void sucessoAoBuscarVagasPorEditalId() throws Exception {
+
+        Vaga vaga1 = new Vaga("Javascript", "2", 2, edital, usuario);
+        vaga1 = vagaRepository.save(vaga1);
+
+        Edital edital2 = new Edital("2022.1", LocalDate.of(2022, 2, 1), LocalDate.of(2022, 2, 15), usuario);
+        edital2 = editalRepository.save(edital2);
+        Vaga vaga2 = new Vaga("Programacao orientada a objetos", "3", 1, edital2, usuario);
+
+        enviarGetPorEditalId(this.edital.getId())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(vaga1.getId()))
+                .andExpect(jsonPath("$[0].disciplina").value(vaga1.getDisciplina()))
+                .andExpect(jsonPath("$[0].periodo").value(vaga1.getPeriodo()))
+                .andExpect(jsonPath("$[0].quantidade").value(vaga1.getQuantidade()));
+    }
+
+    @Test
+    void sucessoAoBuscarVagasVaziasPorEditalId() throws Exception {
+        enviarGetPorEditalId(this.edital.getId())
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
+    }
+
+    @Test
+    void badRequestAoBuscarVagasPorEditalQueNaoExiste() throws Exception {
+        enviarGetPorEditalIdEValidarRespostaDeErro(2L, "Esse edital não existe", HttpStatus.BAD_REQUEST);
+
+        List<Edital> editais = editalRepository.findAll();
+        assertEquals(1, editais.size());
+    }
+
 }

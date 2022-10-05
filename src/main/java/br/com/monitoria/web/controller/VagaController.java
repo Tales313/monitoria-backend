@@ -1,7 +1,9 @@
 package br.com.monitoria.web.controller;
 
+import br.com.monitoria.domain.Edital;
 import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.domain.Vaga;
+import br.com.monitoria.exception.NotFoundException;
 import br.com.monitoria.repository.EditalRepository;
 import br.com.monitoria.repository.VagaRepository;
 import br.com.monitoria.util.Paths;
@@ -12,6 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(Paths.VAGAS)
@@ -41,6 +46,16 @@ public class VagaController {
 
         return new VagaResponse(vaga);
 
+    }
+
+    @GetMapping("/{id_edital}")
+    public List<VagaResponse> buscarVagasPorEdital(@PathVariable("id_edital") Long id) {
+        editalRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("Esse edital não existe"));
+
+        List<Vaga> vagas = vagaRepository.findByEditalId(id);
+
+        return vagas.stream().map(VagaResponse::new).collect(Collectors.toList());
     }
 
 }
