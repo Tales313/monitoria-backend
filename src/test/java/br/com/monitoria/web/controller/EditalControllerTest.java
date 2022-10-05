@@ -88,6 +88,13 @@ class EditalControllerTest {
                 .accept(MediaType.APPLICATION_JSON));
     }
 
+    private ResultActions enviarGetEditalAtivo() throws Exception {
+
+        return mockMvc.perform(MockMvcRequestBuilders.get(Paths.EDITAIS + "/ativo")
+                .header("Authorization", "Bearer " + token)
+                .accept(MediaType.APPLICATION_JSON));
+    }
+
     @Test
     void sucessoAoCriarEdital() throws Exception {
 
@@ -191,10 +198,10 @@ class EditalControllerTest {
 
         enviarGet(edital.getId())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("1"))
-                .andExpect(jsonPath("$.semestre").value("2022.2"))
-                .andExpect(jsonPath("$.inicioInscricoes").value("2022-07-01"))
-                .andExpect(jsonPath("$.fimInscricoes").value("2022-07-15"));
+                .andExpect(jsonPath("$.id").value(edital.getId()))
+                .andExpect(jsonPath("$.semestre").value(edital.getSemestre()))
+                .andExpect(jsonPath("$.inicioInscricoes").value(edital.getInicioInscricoes().toString()))
+                .andExpect(jsonPath("$.fimInscricoes").value(edital.getFimInscricoes().toString()));
     }
 
     @Test
@@ -204,6 +211,27 @@ class EditalControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Bad Request"))
                 .andExpect(jsonPath("$.message").value("Edital não encontrado"));
+    }
+
+    @Test
+    void sucessoAoBuscarPeloEditalAtivo() throws Exception {
+        Edital edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
+        edital = editalRepository.save(edital);
+
+        enviarGetEditalAtivo()
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(edital.getId()))
+                .andExpect(jsonPath("$.semestre").value(edital.getSemestre()))
+                .andExpect(jsonPath("$.inicioInscricoes").value(edital.getInicioInscricoes().toString()))
+                .andExpect(jsonPath("$.fimInscricoes").value(edital.getFimInscricoes().toString()));
+    }
+
+    @Test
+    void notFoundAoBuscarPeloEditalAtivoEEleNaoExiste() throws Exception {
+        enviarGetEditalAtivo()
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("Não há nenhum edital cadastrado"));
     }
 
 }

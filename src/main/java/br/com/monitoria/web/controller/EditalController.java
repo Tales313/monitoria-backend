@@ -4,6 +4,7 @@ import br.com.monitoria.domain.Edital;
 import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.exception.DataInscricoesException;
 import br.com.monitoria.exception.NotFoundException;
+import br.com.monitoria.exception.SemEditalAtivoException;
 import br.com.monitoria.repository.EditalRepository;
 import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.EditalRequest;
@@ -51,6 +52,14 @@ public class EditalController {
 
         return new EditalResponse(edital);
 
+    }
+
+    @GetMapping("/ativo")
+    public EditalResponse buscarEditalAtivo() {
+        Edital edital = editalRepository.findTopByOrderByIdDesc().orElseThrow(
+                () -> new SemEditalAtivoException("Não há nenhum edital cadastrado"));
+
+        return new EditalResponse(edital);
     }
 
 }
