@@ -1,9 +1,6 @@
 package br.com.monitoria.web.exceptionhandler;
 
-import br.com.monitoria.exception.DataInscricoesException;
-import br.com.monitoria.exception.InscricaoException;
-import br.com.monitoria.exception.NotFoundException;
-import br.com.monitoria.exception.OperacaoNegadaException;
+import br.com.monitoria.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -104,6 +101,16 @@ public class ControllerAdvice {
                 HttpStatus.UNAUTHORIZED.value(),
                 HttpStatus.UNAUTHORIZED.getReasonPhrase(),
                 "Senha incorreta");
+    }
+
+    @ExceptionHandler(SemEditalAtivoException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorMessage handleSemEditalAtivoException(SemEditalAtivoException ex) {
+        return new ErrorMessage(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                ex.getMessage()
+        );
     }
 
 }
