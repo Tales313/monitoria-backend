@@ -104,11 +104,11 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler(SemEditalAtivoException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ErrorMessage handleSemEditalAtivoException(SemEditalAtivoException ex) {
         return new ErrorMessage(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase(),
                 ex.getMessage()
         );
     }

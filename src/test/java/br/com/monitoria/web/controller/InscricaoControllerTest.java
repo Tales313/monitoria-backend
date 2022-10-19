@@ -93,6 +93,22 @@ class InscricaoControllerTest {
                 .andExpect(jsonPath("$.message").value(mensagemDeErro));
     }
 
+    private ResultActions enviarGetProximaOpcao() throws Exception {
+
+        return mockMvc.perform(MockMvcRequestBuilders.get(Paths.INSCRICOES + Paths.PROXIMA_OPCAO)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + token)
+                .accept(MediaType.APPLICATION_JSON));
+    }
+
+    public void enviarGetProximaOpcaoEValidarRespostaDeErro(String mensagemDeErro, HttpStatus httpStatus) throws Exception {
+        enviarGetProximaOpcao()
+                .andExpect(status().is(httpStatus.value()))
+                .andExpect(jsonPath("$.status").value(httpStatus.value()))
+                .andExpect(jsonPath("$.error").value(httpStatus.getReasonPhrase()))
+                .andExpect(jsonPath("$.message").value(mensagemDeErro));
+    }
+
     @Test
     void sucessoAoCriarInscricao() throws Exception {
         this.token = autenticarComAluno(objectMapper, mockMvc);
@@ -334,4 +350,65 @@ class InscricaoControllerTest {
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
     }
+
+    @Test
+    void retorno1CasoAlunoNaoTenhaNenhumaInscricao() throws Exception {
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+
+        enviarGetProximaOpcao()
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.opcao").value("1"));
+    }
+
+    @Test
+    void retorna2CasoAlunoJaTenhaUmaInscricao() throws Exception {
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
+
+        Inscricao inscricaoOpcao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
+        inscricaoRepository.save(inscricaoOpcao1);
+
+        enviarGetProximaOpcao()
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.opcao").value("2"));
+    }
+
+    @Test
+    void retorna1NegativoCasoAlunoJaTenhaDuasInscricoes() throws Exception {
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
+
+        Inscricao inscricaoOpcao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
+        inscricaoRepository.save(inscricaoOpcao1);
+
+        Inscricao inscricaoOpcao2 = new Inscricao(2, 85.0, 75.0, 78.5, vaga2, usuario);
+        inscricaoRepository.save(inscricaoOpcao2);
+
+        enviarGetProximaOpcao()
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.opcao").value("-1"));
+    }
+
+    @Test
+    void unprocessableEntityCasoNaoExistaEditalAtivo() throws Exception {
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+
+        vagaRepository.deleteAll();
+        editalRepository.deleteAll();
+
+        enviarGetProximaOpcaoEValidarRespostaDeErro("Não há nenhum edital cadastrado", HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @Test
+    void forbiddenAoAdminTentarAcessarEndpointDeProximaOpcao() throws Exception {
+        enviarGetProximaOpcaoEValidarRespostaDeErro("Você não tem autorização para executar essa ação.", HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void forbiddenAoCoordenadorTentarAcessarEndpointDeProximaOpcao() throws Exception {
+        this.token = autenticarComCoordenador(objectMapper, mockMvc);
+
+        enviarGetProximaOpcaoEValidarRespostaDeErro("Você não tem autorização para executar essa ação.", HttpStatus.FORBIDDEN);
+    }
+
 }

@@ -227,10 +227,10 @@ class EditalControllerTest {
     }
 
     @Test
-    void notFoundAoBuscarPeloEditalAtivoEEleNaoExiste() throws Exception {
+    void unprocessableEntityAoBuscarPeloEditalAtivoEEleNaoExiste() throws Exception {
         enviarGetEditalAtivo()
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.error").value("Unprocessable Entity"))
                 .andExpect(jsonPath("$.message").value("Não há nenhum edital cadastrado"));
     }
 
