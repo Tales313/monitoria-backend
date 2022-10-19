@@ -3,6 +3,7 @@ package br.com.monitoria.web.controller;
 import br.com.monitoria.domain.*;
 import br.com.monitoria.exception.NotFoundException;
 import br.com.monitoria.exception.OperacaoNegadaException;
+import br.com.monitoria.exception.SemEditalAtivoException;
 import br.com.monitoria.repository.EditalRepository;
 import br.com.monitoria.repository.InscricaoRepository;
 import br.com.monitoria.repository.VagaRepository;
@@ -11,6 +12,7 @@ import br.com.monitoria.util.CalculaMedia;
 import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.InscricaoRequest;
 import br.com.monitoria.web.response.InscricaoResponse;
+import br.com.monitoria.web.response.ProximaOpcaoResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -62,6 +64,31 @@ public class InscricaoController {
 
         return new InscricaoResponse(inscricao);
 
+    }
+
+    @GetMapping(Paths.PROXIMA_OPCAO)
+    public ProximaOpcaoResponse getProximaOpcao() {
+        Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Edital edital = editalRepository.findTopByOrderByIdDesc().orElseThrow(
+                () -> new SemEditalAtivoException("Não há nenhum edital cadastrado"));
+
+        int qtdInscricoes = inscricaoRepository.
+                findByUsuarioIdAndVagaEditalId(usuario.getId(), edital.getId())
+                .size();
+
+        int proximaOpcao = -1;
+
+        switch (qtdInscricoes) {
+            case 0:
+                proximaOpcao = 1;
+                break;
+            case 1:
+                proximaOpcao = 2;
+                break;
+        }
+
+        return new ProximaOpcaoResponse(proximaOpcao);
     }
 
 }

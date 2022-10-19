@@ -7,5 +7,6 @@ public class Paths {
     public static final String EDITAIS = "/editais";
     public static final String VAGAS = "/vagas";
     public static final String INSCRICOES = "/inscricoes";
+    public static final String PROXIMA_OPCAO = "/proxima_opcao";
 
 }
