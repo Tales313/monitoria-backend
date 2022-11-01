@@ -54,7 +54,7 @@ class AutenticacaoControllerTest {
 
     @Test
     @Transactional // precisei adicionar pra que as persistencias nao dessem lazy initialization exception
-    void sucessoAoAutenticar() throws Exception {
+    void sucessoAoAutenticarAluno() throws Exception {
         Perfil perfilAluno = perfilRepository.findByNome(PerfilEnum.ALUNO).get();
         Usuario usuario = new Usuario("teste@gmail.com", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011", LocalDate.of(1998, 10, 11), perfilAluno);
         perfilAluno.addUsuario(usuario);
@@ -64,7 +64,40 @@ class AutenticacaoControllerTest {
         enviarPost(loginRequest)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tipo").value("Bearer"))
-                .andExpect(jsonPath("$.token").isNotEmpty());
+                .andExpect(jsonPath("$.token").isNotEmpty())
+                .andExpect(jsonPath("$.perfil").value(PerfilEnum.ALUNO.toString()));
+    }
+
+    @Test
+    @Transactional
+    void sucessoAoAutenticarCoordenador() throws Exception {
+        Perfil perfilCoordenador = perfilRepository.findByNome(PerfilEnum.COORDENADOR).get();
+        Usuario usuario = new Usuario("teste@gmail.com", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011", LocalDate.of(1998, 10, 11), perfilCoordenador);
+        perfilCoordenador.addUsuario(usuario);
+        usuarioRepository.save(usuario);
+        LoginRequest loginRequest = new LoginRequest("teste@gmail.com", "123456");
+
+        enviarPost(loginRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tipo").value("Bearer"))
+                .andExpect(jsonPath("$.token").isNotEmpty())
+                .andExpect(jsonPath("$.perfil").value(PerfilEnum.COORDENADOR.toString()));
+    }
+
+    @Test
+    @Transactional
+    void sucessoAoAutenticarAdmin() throws Exception {
+        Perfil perfilAdmin = perfilRepository.findByNome(PerfilEnum.ADMIN).get();
+        Usuario usuario = new Usuario("teste@gmail.com", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011", LocalDate.of(1998, 10, 11), perfilAdmin);
+        perfilAdmin.addUsuario(usuario);
+        usuarioRepository.save(usuario);
+        LoginRequest loginRequest = new LoginRequest("teste@gmail.com", "123456");
+
+        enviarPost(loginRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tipo").value("Bearer"))
+                .andExpect(jsonPath("$.token").isNotEmpty())
+                .andExpect(jsonPath("$.perfil").value(PerfilEnum.ADMIN.toString()));
     }
 
     @Test

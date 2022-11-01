@@ -1,5 +1,7 @@
 package br.com.monitoria.web.controller;
 
+import br.com.monitoria.domain.Usuario;
+import br.com.monitoria.repository.UsuarioRepository;
 import br.com.monitoria.security.TokenService;
 import br.com.monitoria.service.HashService;
 import br.com.monitoria.util.Paths;
@@ -28,14 +30,18 @@ public class AutenticacaoController {
 
     private HashService hashService;
 
+    private UsuarioRepository usuarioRepository;
+
     public AutenticacaoController(
             AuthenticationManager authenticationManager,
             TokenService tokenService,
-            HashService hashService
+            HashService hashService,
+            UsuarioRepository usuarioRepository
     ) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
         this.hashService = hashService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @PostMapping
@@ -45,7 +51,8 @@ public class AutenticacaoController {
         request.setSenha(hashService.hash(request.getSenha()));
         Authentication authentication = authenticationManager.authenticate(login);
         String token = tokenService.gerarToken(authentication);
-        return ResponseEntity.ok(new LoginResponse(token, "Bearer"));
+        Usuario usuario = usuarioRepository.findByLogin(request.getLogin()).get();
+        return ResponseEntity.ok(new LoginResponse(token, "Bearer", usuario.getPerfilUnico().getNome()));
     }
 
 }
