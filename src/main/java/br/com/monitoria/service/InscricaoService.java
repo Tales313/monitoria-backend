@@ -25,6 +25,8 @@ public class InscricaoService {
     * Um aluno pode ter no maximo 2 inscrições em seu nome. E elas devem ser cadastradas em ordem
     * de opcao. A opcao 1 primeiro e depois a opcao 2.
     *
+    * Um aluno não pode se inscrever duas vezes na mesma vaga.
+    *
     * Esse método considera que as opcoes sempre serão 1 ou 2, nunca outro valor. Isso é validado
     * na classe InscricaoRequest, pela anotação @Range
     *
@@ -42,14 +44,20 @@ public class InscricaoService {
         if(edital.getFimInscricoes().isBefore(hoje))
             throw new InscricaoException("O edital " + edital.getSemestre() + " já está fechado");
 
-        List<Inscricao> inscricoesDoAluno = inscricaoRepository.
+        List<Inscricao> inscricoesDoAlunoNessaVaga = inscricaoRepository.
+                findByUsuarioIdAndVagaId(usuario.getId(), vaga.getId());
+
+        if(! inscricoesDoAlunoNessaVaga.isEmpty())
+            throw new InscricaoException("Aluno já inscrito nessa vaga");
+
+        List<Inscricao> inscricoesDoAlunoNesseEdital = inscricaoRepository.
                 findByUsuarioIdAndVagaEditalId(usuario.getId(), edital.getId());
 
-        if(!inscricoesDoAluno.isEmpty()) {
+        if(! inscricoesDoAlunoNesseEdital.isEmpty()) {
 
-            if(inscricoesDoAluno.size() == 1 && inscricaoRequest.getOpcao() == 1)
+            if(inscricoesDoAlunoNesseEdital.size() == 1 && inscricaoRequest.getOpcao() == 1)
                 throw new InscricaoException("Sua segunda inscrição deve ser a opção 2");
-            else if (inscricoesDoAluno.size() == 2)
+            else if (inscricoesDoAlunoNesseEdital.size() == 2)
                 throw new InscricaoException("Você não pode ter mais que duas inscrições");
 
         } else {

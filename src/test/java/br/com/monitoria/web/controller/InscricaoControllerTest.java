@@ -280,7 +280,7 @@ class InscricaoControllerTest {
         Inscricao inscricaoOpcao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
         inscricaoOpcao1 = inscricaoRepository.save(inscricaoOpcao1);
 
-        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, 1L);
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, vaga2.getId());
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, "Sua segunda inscrição deve ser a opção 2", HttpStatus.UNPROCESSABLE_ENTITY);
 
@@ -387,6 +387,22 @@ class InscricaoControllerTest {
         enviarGetProximaOpcao()
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.opcao").value("-1"));
+    }
+
+    @Test
+    void unprocessableEntityCasoAlunoTenteSeInscreverNaMesmaVagaDuasVezes() throws Exception {
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
+
+        Inscricao inscricaoOpcao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
+        inscricaoRepository.save(inscricaoOpcao1);
+
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(2, 85.0, 70.0, vaga1.getId());
+
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, "Aluno já inscrito nessa vaga", HttpStatus.UNPROCESSABLE_ENTITY);
+
+        List<Inscricao> inscricoes = inscricaoRepository.findAll();
+        assertEquals(1, inscricoes.size());
     }
 
     @Test
