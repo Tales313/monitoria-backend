@@ -90,7 +90,7 @@ class UsuarioControllerTest {
         assertEquals("20221370001", usuario.getMatricula());
         assertNotNull(usuario.getAuthorities());
         assertFalse(usuario.getAuthorities().isEmpty());
-        assertEquals(usuario.getPerfilUnico().getNome(), PerfilEnum.ALUNO);
+        assertEquals(PerfilEnum.ALUNO, usuario.getPerfilUnico().getNome());
     }
 
     @Test
