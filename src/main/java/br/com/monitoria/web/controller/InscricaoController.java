@@ -96,7 +96,9 @@ public class InscricaoController {
 
     @GetMapping(Paths.RESULTADOS)
     public List<ResultadoResponse> getResultados(@RequestParam Long editalId) {
-        List<Inscricao> inscricoes = inscricaoRepository.findByVagaEditalId(editalId);
+        // pegando resultados ordenados pela disciplina (alfabética), media, cre e nota decrescentes
+        List<Inscricao> inscricoes = inscricaoRepository.
+                findByVagaEditalIdOrderByVagaDisciplinaAscMediaDescCreDescNotaDisciplinaDesc(editalId);
 
         return inscricoes.stream().map(
                 ResultadoResponse::new).collect(Collectors.toList());
