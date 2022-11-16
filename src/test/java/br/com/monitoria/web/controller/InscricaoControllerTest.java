@@ -23,8 +23,7 @@ import java.util.Optional;
 
 import static br.com.monitoria.testUtils.UsuarioTestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -107,6 +106,14 @@ class InscricaoControllerTest {
                 .andExpect(jsonPath("$.status").value(httpStatus.value()))
                 .andExpect(jsonPath("$.error").value(httpStatus.getReasonPhrase()))
                 .andExpect(jsonPath("$.message").value(mensagemDeErro));
+    }
+
+    public ResultActions enviarGetResultados(String editalId) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.get(Paths.INSCRICOES + Paths.RESULTADOS)
+                .param("editalId", editalId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + token)
+                .accept(MediaType.APPLICATION_JSON));
     }
 
     @Test
@@ -425,6 +432,32 @@ class InscricaoControllerTest {
         this.token = autenticarComCoordenador(objectMapper, mockMvc);
 
         enviarGetProximaOpcaoEValidarRespostaDeErro("Você não tem autorização para executar essa ação.", HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void sucessoAoBuscarResultados() throws Exception {
+
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
+        Inscricao inscricao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
+        inscricao1 = inscricaoRepository.save(inscricao1);
+
+        enviarGetResultados(this.edital.getId().toString())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nomeAluno").value(inscricao1.getUsuario().getNome()))
+                .andExpect(jsonPath("$[0].nota").value(inscricao1.getNotaDisciplina()))
+                .andExpect(jsonPath("$[0].cre").value(inscricao1.getCre()))
+                .andExpect(jsonPath("$[0].media").value(inscricao1.getMedia()))
+                .andExpect(jsonPath("$[0].disciplina").value(inscricao1.getVaga().getDisciplina()))
+                .andExpect(jsonPath("$[0].opcao").value(inscricao1.getOpcao()))
+                .andExpect(jsonPath("$[0].resultado").value(inscricao1.getResultado().toString()));
+    }
+
+    @Test
+    void sucessoAoBuscarResultadosVazio() throws Exception {
+        enviarGetResultados(this.edital.getId().toString())
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
     }
 
 }
