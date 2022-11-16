@@ -13,11 +13,14 @@ import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.InscricaoRequest;
 import br.com.monitoria.web.response.InscricaoResponse;
 import br.com.monitoria.web.response.ProximaOpcaoResponse;
+import br.com.monitoria.web.response.ResultadoResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(Paths.INSCRICOES)
@@ -89,6 +92,14 @@ public class InscricaoController {
         }
 
         return new ProximaOpcaoResponse(proximaOpcao);
+    }
+
+    @GetMapping(Paths.RESULTADOS)
+    public List<ResultadoResponse> getResultados(@RequestParam Long editalId) {
+        List<Inscricao> inscricoes = inscricaoRepository.findByVagaEditalId(editalId);
+
+        return inscricoes.stream().map(
+                ResultadoResponse::new).collect(Collectors.toList());
     }
 
 }

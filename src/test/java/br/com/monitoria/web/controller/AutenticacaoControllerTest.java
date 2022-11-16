@@ -56,7 +56,7 @@ class AutenticacaoControllerTest {
     @Transactional // precisei adicionar pra que as persistencias nao dessem lazy initialization exception
     void sucessoAoAutenticarAluno() throws Exception {
         Perfil perfilAluno = perfilRepository.findByNome(PerfilEnum.ALUNO).get();
-        Usuario usuario = new Usuario("teste@gmail.com", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011", LocalDate.of(1998, 10, 11), perfilAluno);
+        Usuario usuario = new Usuario("teste@gmail.com", "NomeTeste", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011", LocalDate.of(1998, 10, 11), perfilAluno);
         perfilAluno.addUsuario(usuario);
         usuarioRepository.save(usuario);
         LoginRequest loginRequest = new LoginRequest("teste@gmail.com", "123456");
@@ -72,7 +72,7 @@ class AutenticacaoControllerTest {
     @Transactional
     void sucessoAoAutenticarCoordenador() throws Exception {
         Perfil perfilCoordenador = perfilRepository.findByNome(PerfilEnum.COORDENADOR).get();
-        Usuario usuario = new Usuario("teste@gmail.com", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011", LocalDate.of(1998, 10, 11), perfilCoordenador);
+        Usuario usuario = new Usuario("teste@gmail.com", "NomeTeste", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011", LocalDate.of(1998, 10, 11), perfilCoordenador);
         perfilCoordenador.addUsuario(usuario);
         usuarioRepository.save(usuario);
         LoginRequest loginRequest = new LoginRequest("teste@gmail.com", "123456");
@@ -88,7 +88,7 @@ class AutenticacaoControllerTest {
     @Transactional
     void sucessoAoAutenticarAdmin() throws Exception {
         Perfil perfilAdmin = perfilRepository.findByNome(PerfilEnum.ADMIN).get();
-        Usuario usuario = new Usuario("teste@gmail.com", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011", LocalDate.of(1998, 10, 11), perfilAdmin);
+        Usuario usuario = new Usuario("teste@gmail.com", "NomeTeste", "$2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu", "20171370011", LocalDate.of(1998, 10, 11), perfilAdmin);
         perfilAdmin.addUsuario(usuario);
         usuarioRepository.save(usuario);
         LoginRequest loginRequest = new LoginRequest("teste@gmail.com", "123456");

@@ -39,7 +39,7 @@ public class UsuarioController {
     public UsuarioResponse cadastrarUsuario(@RequestBody @Valid UsuarioRequest request) {
         String senha = hashService.hash(request.getSenha());
         Perfil perfilAluno = perfilRepository.findByNome(PerfilEnum.ALUNO).get();
-        Usuario usuario = new Usuario(request.getLogin(), senha, request.getMatricula(), request.getDataNascimento(), perfilAluno);
+        Usuario usuario = new Usuario(request.getLogin(), request.getNome(), senha, request.getMatricula(), request.getDataNascimento(), perfilAluno);
         perfilAluno.addUsuario(usuario);
         // É necessario setar o relacionamento dos dois lados, isso garante que a tabela
         // intermediaria do ManyToMany seja alimentada

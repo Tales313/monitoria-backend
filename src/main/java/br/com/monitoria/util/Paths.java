@@ -9,4 +9,6 @@ public class Paths {
     public static final String INSCRICOES = "/inscricoes";
     public static final String PROXIMA_OPCAO = "/proxima_opcao";
 
+    public static final String RESULTADOS = "/resultados";
+
 }

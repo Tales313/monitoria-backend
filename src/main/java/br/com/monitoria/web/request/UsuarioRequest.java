@@ -13,6 +13,9 @@ public class UsuarioRequest {
     @ValorUnico(classe = Usuario.class, nomeDoCampo = "login", message = "Já existe um usuário com este email")
     private String login;
 
+    @NotBlank(message = "O nome não deve estar em branco")
+    private String nome;
+
     @NotNull(message = "A senha não deve ser nula")
     @Size(min = 6, max = 20)
     private String senha;
@@ -24,8 +27,9 @@ public class UsuarioRequest {
     @Past(message = "A data de nascimento não pode ser no futuro")
     private LocalDate dataNascimento;
 
-    public UsuarioRequest(String login, String senha, String matricula, LocalDate dataNascimento) {
+    public UsuarioRequest(String login, String nome, String senha, String matricula, LocalDate dataNascimento) {
         this.login = login;
+        this.nome = nome;
         this.senha = senha;
         this.matricula = matricula;
         this.dataNascimento = dataNascimento;
@@ -33,6 +37,10 @@ public class UsuarioRequest {
 
     public String getLogin() {
         return login;
+    }
+
+    public String getNome() {
+        return nome;
     }
 
     public String getSenha() {
