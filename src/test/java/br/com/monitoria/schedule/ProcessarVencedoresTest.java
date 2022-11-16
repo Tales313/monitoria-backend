@@ -58,15 +58,15 @@ class ProcessarVencedoresTest {
         Perfil perfilAluno = perfilRepository.findByNome(PerfilEnum.ALUNO).get();
 
         List<Usuario> alunos = new ArrayList<>();
-        alunos.add(new Usuario("aluno_01@gmail.com", senha, "20221370001", LocalDate.of(2000, 1, 1), perfilAluno));
-        alunos.add(new Usuario("aluno_02@gmail.com", senha, "20221370002", LocalDate.of(2000, 3, 1), perfilAluno));
-        alunos.add(new Usuario("aluno_03@gmail.com", senha, "20221370003", LocalDate.of(2000, 6, 1), perfilAluno));
-        alunos.add(new Usuario("aluno_04@gmail.com", senha, "20221370004", LocalDate.of(2001, 1, 1), perfilAluno));
-        alunos.add(new Usuario("aluno_05@gmail.com", senha, "20221370005", LocalDate.of(2001, 3, 1), perfilAluno));
-        alunos.add(new Usuario("aluno_06@gmail.com", senha, "20221370006", LocalDate.of(2001, 6, 1), perfilAluno));
-        alunos.add(new Usuario("aluno_07@gmail.com", senha, "20221370007", LocalDate.of(2002, 1, 1), perfilAluno));
-        alunos.add(new Usuario("aluno_08@gmail.com", senha, "20221370008", LocalDate.of(2002, 3, 1), perfilAluno));
-        alunos.add(new Usuario("aluno_09@gmail.com", senha, "20221370009", LocalDate.of(2002, 6, 1), perfilAluno));
+        alunos.add(new Usuario("aluno_01@gmail.com", "NomeTeste", senha, "20221370001", LocalDate.of(2000, 1, 1), perfilAluno));
+        alunos.add(new Usuario("aluno_02@gmail.com", "NomeTeste", senha, "20221370002", LocalDate.of(2000, 3, 1), perfilAluno));
+        alunos.add(new Usuario("aluno_03@gmail.com", "NomeTeste", senha, "20221370003", LocalDate.of(2000, 6, 1), perfilAluno));
+        alunos.add(new Usuario("aluno_04@gmail.com", "NomeTeste", senha, "20221370004", LocalDate.of(2001, 1, 1), perfilAluno));
+        alunos.add(new Usuario("aluno_05@gmail.com", "NomeTeste", senha, "20221370005", LocalDate.of(2001, 3, 1), perfilAluno));
+        alunos.add(new Usuario("aluno_06@gmail.com", "NomeTeste", senha, "20221370006", LocalDate.of(2001, 6, 1), perfilAluno));
+        alunos.add(new Usuario("aluno_07@gmail.com", "NomeTeste", senha, "20221370007", LocalDate.of(2002, 1, 1), perfilAluno));
+        alunos.add(new Usuario("aluno_08@gmail.com", "NomeTeste", senha, "20221370008", LocalDate.of(2002, 3, 1), perfilAluno));
+        alunos.add(new Usuario("aluno_09@gmail.com", "NomeTeste", senha, "20221370009", LocalDate.of(2002, 6, 1), perfilAluno));
 
         alunos.forEach(perfilAluno::addUsuario);
         usuarioRepository.saveAll(alunos);

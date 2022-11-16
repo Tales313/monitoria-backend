@@ -25,6 +25,9 @@ public class Usuario implements UserDetails {
     private String login;
 
     @NotBlank
+    private String nome;
+
+    @NotBlank
     private String senha;
 
     @NotBlank
@@ -48,9 +51,10 @@ public class Usuario implements UserDetails {
      * @param login
      * @param senha deve entrar ja criptografada
      */
-    public Usuario(@NotBlank @Email String login, @NotBlank String senha, @NotBlank String matricula,
+    public Usuario(@NotBlank @Email String login, @NotBlank String nome, @NotBlank String senha, @NotBlank String matricula,
                    @NotNull LocalDate dataNascimento, @NotNull Perfil perfil) {
         this.login = login;
+        this.nome = nome;
         this.senha = senha;
         this.matricula = matricula;
         this.dataNascimento = dataNascimento;
@@ -64,6 +68,10 @@ public class Usuario implements UserDetails {
 
     public String getLogin() {
         return login;
+    }
+
+    public String getNome() {
+        return nome;
     }
 
     public String getSenha() {

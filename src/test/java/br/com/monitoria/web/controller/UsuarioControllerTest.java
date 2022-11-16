@@ -73,7 +73,7 @@ class UsuarioControllerTest {
     @Test
     void sucessoAoCriarUsuario() throws Exception {
 
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370001", LocalDate.of(1998, 11, 10));
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "NomeTeste", "123456", "20221370001", LocalDate.of(1998, 11, 10));
 
         enviarPost(request)
             .andExpect(status().isCreated())
@@ -95,7 +95,7 @@ class UsuarioControllerTest {
 
     @Test
     void badRequestAoCriarUsuarioComEmailEmBranco() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("", "123456", "20221370001", LocalDate.of(1998, 11, 10));
+        UsuarioRequest request = new UsuarioRequest("", "NomeTeste", "123456", "20221370001", LocalDate.of(1998, 11, 10));
 
         enviarPostEValidarRespostaDeErro(request, "O login não deve estar em branco", HttpStatus.BAD_REQUEST);
 
@@ -105,7 +105,7 @@ class UsuarioControllerTest {
 
     @Test
     void badRequestAoCriarUsuarioComEmailInvalido() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("abc123", "123456", "20221370001", LocalDate.of(1998, 11, 10));
+        UsuarioRequest request = new UsuarioRequest("abc123", "NomeTeste", "123456", "20221370001", LocalDate.of(1998, 11, 10));
 
         enviarPostEValidarRespostaDeErro(request, "deve ser um endereço de e-mail bem formado", HttpStatus.BAD_REQUEST);
 
@@ -117,11 +117,11 @@ class UsuarioControllerTest {
     @Transactional // precisei adicionar pra que as persistencias nao dessem lazy initialization exception
     void badRequestAoCriarUsuarioComEmailQueJaExiste() throws Exception {
         Perfil perfilAluno = perfilRepository.findByNome(PerfilEnum.ALUNO).get();
-        Usuario usuario = new Usuario("teste@gmail.com", "123456", "20221370001", LocalDate.of(1998, 10, 11), perfilAluno);
+        Usuario usuario = new Usuario("teste@gmail.com", "NomeTeste", "123456", "20221370001", LocalDate.of(1998, 10, 11), perfilAluno);
         perfilAluno.addUsuario(usuario);
         usuarioRepository.save(usuario);
 
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370002", LocalDate.of(1998, 11, 10));
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "NomeTeste", "123456", "20221370002", LocalDate.of(1998, 11, 10));
 
         enviarPostEValidarRespostaDeErro(request, "Já existe um usuário com este email", HttpStatus.BAD_REQUEST);
 
@@ -130,8 +130,18 @@ class UsuarioControllerTest {
     }
 
     @Test
+    void badRequestAoCriarUsuarioComNomeEmBranco() throws Exception {
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "", "123456", "20221370001", LocalDate.of(1998, 11, 10));
+
+        enviarPostEValidarRespostaDeErro(request, "O nome não deve estar em branco", HttpStatus.BAD_REQUEST);
+
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByLogin("teste@gmail.com");
+        assertTrue(usuarioOptional.isEmpty());
+    }
+
+    @Test
     void badRequestAoCriarUsuarioComSenhaNula() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", null, "20221370002", LocalDate.of(1998, 11, 10));
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "NomeTeste", null, "20221370002", LocalDate.of(1998, 11, 10));
 
         enviarPostEValidarRespostaDeErro(request, "A senha não deve ser nula", HttpStatus.BAD_REQUEST);
 
@@ -139,10 +149,9 @@ class UsuarioControllerTest {
         assertTrue(usuarioOptional.isEmpty());
     }
 
-
     @Test
     void badRequestAoCriarUsuarioComSenhaMenorQue6Digitos() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "12345", "20221370002", LocalDate.of(1998, 11, 10));
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "NomeTeste", "12345", "20221370002", LocalDate.of(1998, 11, 10));
 
         enviarPostEValidarRespostaDeErro(request, "tamanho deve ser entre 6 e 20", HttpStatus.BAD_REQUEST);
 
@@ -152,7 +161,7 @@ class UsuarioControllerTest {
 
     @Test
     void badRequestAoCriarUsuarioComSenhaMaiorQue20Digitos() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "abcdefghijklmnopqrstu", "20221370002", LocalDate.of(1998, 11, 10));
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "NomeTeste", "abcdefghijklmnopqrstu", "20221370002", LocalDate.of(1998, 11, 10));
 
         enviarPostEValidarRespostaDeErro(request, "tamanho deve ser entre 6 e 20", HttpStatus.BAD_REQUEST);
 
@@ -160,10 +169,9 @@ class UsuarioControllerTest {
         assertTrue(usuarioOptional.isEmpty());
     }
 
-
     @Test
     void badRequestAoCriarUsuarioComMatriculaNula() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", null, LocalDate.of(1998, 11, 10));
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "NomeTeste", "123456", null, LocalDate.of(1998, 11, 10));
 
         enviarPostEValidarRespostaDeErro(request, "A matricula não deve estar em branco", HttpStatus.BAD_REQUEST);
 
@@ -173,7 +181,7 @@ class UsuarioControllerTest {
 
     @Test
     void badRequestAoCriarUsuarioComMatriculaEmBranco() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "", LocalDate.of(1998, 11, 10));
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "NomeTeste", "123456", "", LocalDate.of(1998, 11, 10));
 
         enviarPostEValidarRespostaDeErro(request, "A matricula não deve estar em branco", HttpStatus.BAD_REQUEST);
 
@@ -183,7 +191,7 @@ class UsuarioControllerTest {
 
     @Test
     void badRequestAoCriarUsuarioComDataNascimentoNula() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370002", null);
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "NomeTeste", "123456", "20221370002", null);
 
         enviarPostEValidarRespostaDeErro(request, "A data de nascimento deve ser informada", HttpStatus.BAD_REQUEST);
 
@@ -193,7 +201,7 @@ class UsuarioControllerTest {
 
     @Test
     void badRequestAoCriarUsuarioComDataNascimentoNoFuturo() throws Exception {
-        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "123456", "20221370002", LocalDate.now().plusDays(1));
+        UsuarioRequest request = new UsuarioRequest("teste@gmail.com", "NomeTeste", "123456", "20221370002", LocalDate.now().plusDays(1));
 
         enviarPostEValidarRespostaDeErro(request, "A data de nascimento não pode ser no futuro", HttpStatus.BAD_REQUEST);
 
