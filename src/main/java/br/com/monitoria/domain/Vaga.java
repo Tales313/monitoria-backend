@@ -23,6 +23,8 @@ public class Vaga {
     @Positive(message = "A quantidade deve ter valor positivo")
     private Integer quantidade;
 
+    private Boolean preenchida;
+
     @NotNull(message = "Uma vaga deve pertencer a um edital")
     @ManyToOne
     private Edital edital;
@@ -42,6 +44,7 @@ public class Vaga {
         this.disciplina = disciplina;
         this.periodo = periodo;
         this.quantidade = quantidade;
+        this.preenchida = false;
         this.edital = edital;
         this.usuario = usuario;
     }
@@ -60,6 +63,14 @@ public class Vaga {
 
     public Integer getQuantidade() {
         return quantidade;
+    }
+
+    public Boolean isPreenchida() {
+        return preenchida;
+    }
+
+    public void setPreenchida(Boolean preenchida) {
+        this.preenchida = preenchida;
     }
 
     public Edital getEdital() {
