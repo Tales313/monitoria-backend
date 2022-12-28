@@ -55,8 +55,8 @@ public class ProcessarVencedores {
                 return;
             }
 
-            iterarVagasEInscricoesDeOpcao(1, vagas);
-            iterarVagasEInscricoesDeOpcao(2, vagas);
+            definirClassificados(vagas);
+            verificarImpedidos(edital);
             log.info("### Fim do processamento ###");
 
         } else {
@@ -65,15 +65,15 @@ public class ProcessarVencedores {
 
     }
 
-    private void iterarVagasEInscricoesDeOpcao(Integer opcao, List<Vaga> vagas) {
+    private void definirClassificados(List<Vaga> vagas) {
 
         List<Inscricao> inscricoes;
         for(Vaga vaga : vagas) {
 
-            // Pegando da base os alunos pelo id da vaga e opcao 1 ou 2 (parametro)
+            // Pegando da base as inscricoes pelo id da vaga
             // ordenando pela maior media, nota, cre e aluno mais velho
             inscricoes = inscricaoRepository.
-                    findByVagaIdAndOpcaoOrderByMediaDescNotaDisciplinaDescCreDescUsuarioDataNascimentoAsc(vaga.getId(), opcao);
+                    findByVagaIdOrderByMediaDescNotaDisciplinaDescCreDescUsuarioDataNascimentoAsc(vaga.getId());
 
             if(!inscricoes.isEmpty()) {
 
@@ -81,21 +81,17 @@ public class ProcessarVencedores {
                 Inscricao inscricao;
                 int vagasPreenchidas = 0;
 
-                while (vagasPreenchidas < vaga.getQuantidade()) {
+                while (!vaga.isPreenchida()) {
 
                     if (inscricoesIterable.hasNext())
                         inscricao = inscricoesIterable.next();
                     else
-                        break; // é necessario para o while caso a qtd de vagas seja maior que a qtd de inscricoes
+                        break; // é necessario parar o while caso a qtd de vagas seja maior que a qtd de inscricoes
 
-                    if (alunoJaClassificadoNesseEdital(inscricao)) {
-                        log.info("Aluno: " + inscricao.getUsuario().getLogin() + " impedido em " + vaga.getDisciplina() + " por se classificar em outra disciplina!");
-                        inscricao.setResultado(ResultadoEnum.IMPEDIDO);
-                    } else {
-                        vagasPreenchidas++;
-                        log.info("Aluno: " + inscricao.getUsuario().getLogin() + " classificado para " + vaga.getDisciplina() + "!");
-                        inscricao.setResultado(ResultadoEnum.CLASSIFICADO);
-                    }
+                    vagasPreenchidas++;
+                    inscricao.setResultado(ResultadoEnum.CLASSIFICADO);
+                    if(vagasPreenchidas == vaga.getQuantidade())
+                        vaga.setPreenchida(true);
                 }
 
                 // Setando o resultado de nao classificado nos alunos restantes que nao venceram
@@ -105,17 +101,55 @@ public class ProcessarVencedores {
                 });
 
                 inscricaoRepository.saveAll(inscricoes);
+
             }
+
         }
 
     }
 
-    private boolean alunoJaClassificadoNesseEdital(Inscricao inscricao) {
+    private void verificarImpedidos(Edital edital) {
+
+        List<Inscricao> classificados = inscricaoRepository.findByVagaEditalIdAndResultado(edital.getId(), ResultadoEnum.CLASSIFICADO);
+
+        for(Inscricao classificado: classificados) {
+
+            Vaga vaga = classificado.getVaga();
+            List<Inscricao> inscricoesDaVaga = inscricaoRepository.findByVagaIdOrderByMediaDescNotaDisciplinaDescCreDescUsuarioDataNascimentoAsc(vaga.getId());
+
+            for(Inscricao inscricao : inscricoesDaVaga) {
+                // setar impedidos
+                if(inscricao.isSegundaOpcao() && alunoJaClassificadoNesseEditalEmPrimeiraOpcao(inscricao)) {
+                    inscricao.setResultado(ResultadoEnum.IMPEDIDO);
+                    inscricaoRepository.save(inscricao);
+                }
+            }
+
+            if(classificado.isSegundaOpcao() && alunoJaClassificadoNesseEditalEmPrimeiraOpcao(classificado)) {
+
+                classificado.setResultado(ResultadoEnum.IMPEDIDO);
+                inscricaoRepository.save(classificado);
+
+                for(Inscricao inscricao : inscricoesDaVaga) {
+                    // iterar ate achar um nao classificado
+                    if (inscricao.getResultado() == ResultadoEnum.NAO_CLASSIFICADO) {
+                        inscricao.setResultado(ResultadoEnum.CLASSIFICADO);
+                        inscricaoRepository.save(inscricao);
+                        break;
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    private boolean alunoJaClassificadoNesseEditalEmPrimeiraOpcao(Inscricao inscricao) {
         Usuario aluno = inscricao.getUsuario();
         Edital edital = inscricao.getVaga().getEdital();
 
         List<Inscricao> inscricoesDesseAlunoNesseEdital = inscricaoRepository.
-                findByUsuarioIdAndVagaEditalId(aluno.getId(), edital.getId());
+                findByUsuarioIdAndVagaEditalIdAndOpcao(aluno.getId(), edital.getId(), 1);
 
         return inscricoesDesseAlunoNesseEdital.stream()
                 .anyMatch(i -> i.getResultado().equals(ResultadoEnum.CLASSIFICADO));

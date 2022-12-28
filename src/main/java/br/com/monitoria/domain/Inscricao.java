@@ -64,6 +64,10 @@ public class Inscricao {
         this.usuario = usuario;
     }
 
+    public Boolean isSegundaOpcao() {
+        return this.opcao == 2;
+    }
+
     public Long getId() {
         return id;
     }
