@@ -11,4 +11,10 @@ public class Paths {
 
     public static final String RESULTADOS = "/resultados";
 
+    public static final String SWAGGER = "/swagger*/**";
+
+    public static final String SWAGGER_RESRC = "/swagger-resources";
+
+    public static final String V3_DOCS = "/v3/api-docs/**";
+
 }

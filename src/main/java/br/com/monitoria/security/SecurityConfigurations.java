@@ -62,16 +62,18 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.POST, Paths.VAGAS).hasAnyAuthority(PerfilEnum.ADMIN.toString(), PerfilEnum.COORDENADOR.toString())
             .antMatchers(HttpMethod.GET, Paths.INSCRICOES + Paths.PROXIMA_OPCAO).hasAnyAuthority(PerfilEnum.ALUNO.toString())
             .antMatchers(HttpMethod.GET, Paths.INSCRICOES + Paths.RESULTADOS).permitAll()
+            .antMatchers(HttpMethod.GET, Paths.SWAGGER).permitAll()
+            .antMatchers(HttpMethod.GET, Paths.SWAGGER_RESRC).permitAll()
+            .antMatchers(HttpMethod.GET, Paths.V3_DOCS).permitAll()
 
             .anyRequest().authenticated() // qualquer outra url deve estar autenticado para acessar
             .and().exceptionHandling().accessDeniedHandler(accessDeniedHandler())
             .and().addFilterBefore(new AutenticacaoViaTokenFilter(tokenService, usuarioRepository), UsernamePasswordAuthenticationFilter.class);
     }
 
-    // Configs de recursos estaticos(css, js, imgs..)
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/**.html", "/v2/api-docs", "/webjars/**", "/configuration/**", "/swagger-resources/**");
+        web.ignoring().antMatchers("/**.html", Paths.V3_DOCS, "/webjars/**", "/configuration/**", Paths.V3_DOCS);
     }
 
     // esse handler será chamado quando o spring subir uma excecao de access denied
