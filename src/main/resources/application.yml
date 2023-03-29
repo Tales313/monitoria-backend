@@ -1,0 +1,5 @@
+application:
+  api-info:
+    titulo: '@project.name@'
+    descricao: '@project.description@'
+    versao: '@project.version@'
