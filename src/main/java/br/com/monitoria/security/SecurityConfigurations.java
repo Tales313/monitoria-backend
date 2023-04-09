@@ -60,6 +60,7 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.POST, Paths.USUARIOS).permitAll()
             .antMatchers(HttpMethod.POST, Paths.EDITAIS).hasAnyAuthority(PerfilEnum.ADMIN.toString(), PerfilEnum.COORDENADOR.toString())
             .antMatchers(HttpMethod.POST, Paths.VAGAS).hasAnyAuthority(PerfilEnum.ADMIN.toString(), PerfilEnum.COORDENADOR.toString())
+            .antMatchers(HttpMethod.POST, Paths.INSCRICOES).hasAnyAuthority(PerfilEnum.ALUNO.toString())
             .antMatchers(HttpMethod.GET, Paths.INSCRICOES + Paths.PROXIMA_OPCAO).hasAnyAuthority(PerfilEnum.ALUNO.toString())
             .antMatchers(HttpMethod.GET, Paths.INSCRICOES + Paths.RESULTADOS).permitAll()
             .antMatchers(HttpMethod.GET, Paths.SWAGGER).permitAll()

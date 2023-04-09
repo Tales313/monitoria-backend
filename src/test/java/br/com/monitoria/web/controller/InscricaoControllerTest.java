@@ -68,8 +68,8 @@ class InscricaoControllerTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        this.token = autenticarComAdmin(objectMapper, mockMvc);
-        this.usuario = usuarioRepository.findByLogin("admin@gmail.com").get();
+        this.token = autenticarComAluno(objectMapper, mockMvc);
+        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
         this.edital = new Edital("2022.2", LocalDate.now(), LocalDate.now().plusDays(14), usuario);
         editalRepository.save(edital);
         this.vaga1 = new Vaga("Javascript", "2", 2, edital, usuario);
@@ -131,7 +131,6 @@ class InscricaoControllerTest {
 
     @Test
     void sucessoAoCriarInscricao() throws Exception {
-        this.token = autenticarComAluno(objectMapper, mockMvc);
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, 1L);
 
         enviarPost(inscricaoRequest)
@@ -252,6 +251,16 @@ class InscricaoControllerTest {
     }
 
     @Test
+    void badRequestAoCriarInscricaoComVagaNaoExistente() throws Exception {
+        InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, 0L);
+
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, getMessageSource("inscricao.vaga.nao.existe"), HttpStatus.BAD_REQUEST);
+
+        List<Inscricao> inscricoes = inscricaoRepository.findAll();
+        assertTrue(inscricoes.isEmpty());
+    }
+
+    @Test
     void badRequestAoCriarInscricaoComIdVagaNula() throws Exception {
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, null);
 
@@ -263,9 +272,10 @@ class InscricaoControllerTest {
 
     @Test
     void forbiddenAoCriarInscricaoComUsuarioAdmin() throws Exception {
+        this.token = autenticarComAdmin(objectMapper, mockMvc);
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, 1L);
 
-        enviarPostEValidarRespostaDeErro(inscricaoRequest, getMessageSource("inscricao.apenas.alunos"), HttpStatus.FORBIDDEN);
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, getMessageSource("usuario.sem.autorizacao"), HttpStatus.FORBIDDEN);
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -276,7 +286,7 @@ class InscricaoControllerTest {
         this.token = autenticarComCoordenador(objectMapper, mockMvc);
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, 1L);
 
-        enviarPostEValidarRespostaDeErro(inscricaoRequest, getMessageSource("inscricao.apenas.alunos"), HttpStatus.FORBIDDEN);
+        enviarPostEValidarRespostaDeErro(inscricaoRequest, getMessageSource("usuario.sem.autorizacao"), HttpStatus.FORBIDDEN);
 
         List<Inscricao> inscricoes = inscricaoRepository.findAll();
         assertTrue(inscricoes.isEmpty());
@@ -284,7 +294,6 @@ class InscricaoControllerTest {
 
     @Test
     void unprocessableEntityAoCriarPrimeiraInscricaoComOpcao2() throws Exception {
-        this.token = autenticarComAluno(objectMapper, mockMvc);
         InscricaoRequest inscricaoRequest = new InscricaoRequest(2, 85.0, 70.0, 1L);
 
         enviarPostEValidarRespostaDeErro(inscricaoRequest, getMessageSource("inscricao.primeira.opcao"), HttpStatus.UNPROCESSABLE_ENTITY);
@@ -298,7 +307,7 @@ class InscricaoControllerTest {
         this.token = autenticarComAluno(objectMapper, mockMvc);
         this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
         Inscricao inscricaoOpcao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
-        inscricaoOpcao1 = inscricaoRepository.save(inscricaoOpcao1);
+        inscricaoRepository.save(inscricaoOpcao1);
 
         InscricaoRequest inscricaoRequest = new InscricaoRequest(1, 85.0, 70.0, vaga2.getId());
 
@@ -311,8 +320,6 @@ class InscricaoControllerTest {
 
     @Test
     void unprocessableEntityAoCriarMaisQueDuasInscricoes() throws Exception {
-        this.token = autenticarComAluno(objectMapper, mockMvc);
-        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
         Inscricao inscricaoOpcao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
         inscricaoRepository.save(inscricaoOpcao1);
 
@@ -329,9 +336,6 @@ class InscricaoControllerTest {
 
     @Test
     void unprocessableEntityAoCriarInscricaoAntesDaDataDeInicioDoEdital() throws Exception {
-        this.token = autenticarComAluno(objectMapper, mockMvc);
-        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
-
         vagaRepository.deleteAll();
         editalRepository.deleteAll();
 
@@ -351,9 +355,6 @@ class InscricaoControllerTest {
 
     @Test
     void unprocessableEntityAoCriarInscricaoDepoisDaDataDeFimDoEdital() throws Exception {
-        this.token = autenticarComAluno(objectMapper, mockMvc);
-        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
-
         vagaRepository.deleteAll();
         editalRepository.deleteAll();
 
@@ -373,8 +374,6 @@ class InscricaoControllerTest {
 
     @Test
     void retorno1CasoAlunoNaoTenhaNenhumaInscricao() throws Exception {
-        this.token = autenticarComAluno(objectMapper, mockMvc);
-
         enviarGetProximaOpcao()
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.opcao").value("1"));
@@ -382,9 +381,6 @@ class InscricaoControllerTest {
 
     @Test
     void retorna2CasoAlunoJaTenhaUmaInscricao() throws Exception {
-        this.token = autenticarComAluno(objectMapper, mockMvc);
-        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
-
         Inscricao inscricaoOpcao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
         inscricaoRepository.save(inscricaoOpcao1);
 
@@ -395,9 +391,6 @@ class InscricaoControllerTest {
 
     @Test
     void retorna1NegativoCasoAlunoJaTenhaDuasInscricoes() throws Exception {
-        this.token = autenticarComAluno(objectMapper, mockMvc);
-        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
-
         Inscricao inscricaoOpcao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
         inscricaoRepository.save(inscricaoOpcao1);
 
@@ -411,9 +404,6 @@ class InscricaoControllerTest {
 
     @Test
     void unprocessableEntityCasoAlunoTenteSeInscreverNaMesmaVagaDuasVezes() throws Exception {
-        this.token = autenticarComAluno(objectMapper, mockMvc);
-        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
-
         Inscricao inscricaoOpcao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
         inscricaoRepository.save(inscricaoOpcao1);
 
@@ -427,8 +417,6 @@ class InscricaoControllerTest {
 
     @Test
     void unprocessableEntityCasoNaoExistaEditalAtivo() throws Exception {
-        this.token = autenticarComAluno(objectMapper, mockMvc);
-
         vagaRepository.deleteAll();
         editalRepository.deleteAll();
 
@@ -437,21 +425,18 @@ class InscricaoControllerTest {
 
     @Test
     void forbiddenAoAdminTentarAcessarEndpointDeProximaOpcao() throws Exception {
+        this.token = autenticarComAdmin(objectMapper, mockMvc);
         enviarGetProximaOpcaoEValidarRespostaDeErro(getMessageSource("usuario.sem.autorizacao"), HttpStatus.FORBIDDEN);
     }
 
     @Test
     void forbiddenAoCoordenadorTentarAcessarEndpointDeProximaOpcao() throws Exception {
         this.token = autenticarComCoordenador(objectMapper, mockMvc);
-
         enviarGetProximaOpcaoEValidarRespostaDeErro(getMessageSource("usuario.sem.autorizacao"), HttpStatus.FORBIDDEN);
     }
 
     @Test
     void sucessoAoBuscarResultados() throws Exception {
-
-        this.token = autenticarComAluno(objectMapper, mockMvc);
-        this.usuario = usuarioRepository.findByLogin("aluno_01@gmail.com").get();
         Inscricao inscricao1 = new Inscricao(1, 85.0, 75.0, 78.5, vaga1, usuario);
         inscricao1 = inscricaoRepository.save(inscricao1);
 

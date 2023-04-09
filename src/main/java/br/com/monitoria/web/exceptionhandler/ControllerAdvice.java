@@ -58,7 +58,7 @@ public class ControllerAdvice {
     @ExceptionHandler(DataInscricoesException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDataInscricoesException(DataInscricoesException ex, HttpServletRequest request) {
-        return new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getPathInfo());
+        return new ErrorResponse(HttpStatus.BAD_REQUEST, getMessageSource(ex.getMessage()), request.getPathInfo());
     }
 
     @ExceptionHandler(OperacaoNegadaException.class)

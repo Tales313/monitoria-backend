@@ -185,7 +185,7 @@ class EditalControllerTest {
     void badRequestAoCriarEditalComDataInicioInscricoesAposDataFimInscricoes() throws Exception {
         EditalRequest editalRequest = new EditalRequest("2022.1", LocalDate.of(2022, 7, 15), LocalDate.of(2022, 7, 1));
 
-        enviarPostEValidarRespostaDeErro(editalRequest, "A data de início das inscrições deve ser antes da data de fim das incrições", HttpStatus.BAD_REQUEST);
+        enviarPostEValidarRespostaDeErro(editalRequest, getMessageSource("edital.data.inicio.invalida"), HttpStatus.BAD_REQUEST);
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
