@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -40,7 +42,13 @@ class AutenticacaoControllerTest {
     private PerfilRepository perfilRepository;
 
     private ObjectMapper objectMapper;
-    
+
+    @Autowired
+    private MessageSource messageSource;
+
+    private String getMessageSource(String defaultMessage) {
+        return messageSource.getMessage(defaultMessage, null, defaultMessage, LocaleContextHolder.getLocale());
+    }
     public AutenticacaoControllerTest() {
         this.objectMapper = new ObjectMapper();
     }
@@ -110,7 +118,7 @@ class AutenticacaoControllerTest {
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.status").value(HttpStatus.UNAUTHORIZED.value()))
                 .andExpect(jsonPath("$.error").value(HttpStatus.UNAUTHORIZED.getReasonPhrase()))
-                .andExpect(jsonPath("$.message").value("Login inexistente"))
+                .andExpect(jsonPath("$.message").value(getMessageSource("usuario.login.inexistente")))
                 .andExpect(jsonPath("$.path").value(Paths.AUTH));
     }
 
@@ -123,7 +131,7 @@ class AutenticacaoControllerTest {
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.status").value(HttpStatus.UNAUTHORIZED.value()))
                 .andExpect(jsonPath("$.error").value(HttpStatus.UNAUTHORIZED.getReasonPhrase()))
-                .andExpect(jsonPath("$.message").value("Senha incorreta"))
+                .andExpect(jsonPath("$.message").value(getMessageSource("usuario.senha.incorreta")))
                 .andExpect(jsonPath("$.path").value(Paths.AUTH));
     }
 

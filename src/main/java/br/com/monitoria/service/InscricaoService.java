@@ -7,6 +7,8 @@ import br.com.monitoria.domain.Vaga;
 import br.com.monitoria.exception.InscricaoException;
 import br.com.monitoria.repository.InscricaoRepository;
 import br.com.monitoria.web.request.InscricaoRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -14,6 +16,8 @@ import java.util.List;
 
 @Service
 public class InscricaoService {
+
+    private Logger log = LoggerFactory.getLogger(InscricaoService.class);
 
     private InscricaoRepository inscricaoRepository;
 
@@ -34,6 +38,8 @@ public class InscricaoService {
     * As datas de inicio e fim sao includentes.
     * */
     public void validarInscricaoDoAluno(Usuario usuario, Vaga vaga, InscricaoRequest inscricaoRequest) {
+
+        log.info("Validando inscrição");
 
         Edital edital = vaga.getEdital();
         LocalDate hoje = LocalDate.now();
@@ -64,6 +70,8 @@ public class InscricaoService {
             if(inscricaoRequest.getOpcao() == 2)
                 throw new InscricaoException("inscricao.primeira.opcao");
         }
+
+        log.info("Inscrição validada com sucesso");
     }
 
 }
