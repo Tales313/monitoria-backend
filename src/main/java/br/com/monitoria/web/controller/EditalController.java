@@ -32,7 +32,7 @@ public class EditalController {
     public EditalResponse cadastrarEdital(@Valid @RequestBody EditalRequest request) {
 
         if(request.getInicioInscricoes().isAfter(request.getFimInscricoes()))
-            throw new DataInscricoesException("A data de início das inscrições deve ser antes da data de fim das incrições");
+            throw new DataInscricoesException("edital.data.inicio.invalida");
 
         // pegando usuario logado
         Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

@@ -53,11 +53,8 @@ public class InscricaoController {
         // pegando usuario logado
         Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(!usuario.getPerfilUnico().getNome().equals(PerfilEnum.ALUNO))
-            throw new OperacaoNegadaException("inscricao.apenas.alunos");
-
         Vaga vaga = vagaRepository.findById(request.getIdVaga()).orElseThrow(
-                () -> new NotFoundException("Vaga não encontrada"));
+                () -> new NotFoundException("inscricao.vaga.nao.existe"));
 
         inscricaoService.validarInscricaoDoAluno(usuario, vaga, request);
 
