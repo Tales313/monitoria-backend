@@ -1,5 +1,6 @@
 package br.com.monitoria.testUtils;
 
+import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.LoginRequest;
 import br.com.monitoria.web.response.LoginResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +28,7 @@ public class UsuarioTestUtils {
     }
 
     private static String autenticarGenerico(LoginRequest loginRequest, MockMvc mockMvc, ObjectMapper objectMapper) throws Exception {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/auth")
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(Paths.AUTH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest))
                         .accept(MediaType.APPLICATION_JSON))

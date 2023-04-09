@@ -14,14 +14,14 @@ public class Edital {
     @SequenceGenerator(name = "generator_edital", sequenceName = "sequence_id_edital", allocationSize = 1)
     private Long id;
 
-    @NotBlank(message = "O semestre não deve estar em branco")
-    @Pattern(regexp = "^\\d{4}\\.\\d$", message = "O semestre deve ter o formato '2022.1'")
+    @NotBlank(message = "edital.semestre.nao.informado")
+    @Pattern(regexp = "^\\d{4}\\.\\d$", message = "edital.semestre.formato")
     private String semestre;
 
-    @NotNull(message = "A data de inicio das incrições deve ser informada")
+    @NotNull(message = "edital.data.inicio.nao.informado")
     private LocalDate inicioInscricoes;
 
-    @NotNull(message = "A data de fim das inscrições deve ser informada")
+    @NotNull(message = "edital.data.fim.nao.informado")
     private LocalDate fimInscricoes;
 
     @NotNull(message = "Um edital deve ter sido cadastrado por um usuario")
@@ -31,9 +31,9 @@ public class Edital {
     public Edital() {
     }
 
-    public Edital(@NotBlank(message = "O semestre não deve estar em branco") @Pattern(regexp = "^\\d{4}\\.\\d$", message = "O semestre deve ter o formato '2022.1'") String semestre,
-                  @NotNull(message = "A data de inicio das incrições deve ser informada") LocalDate inicioInscricoes,
-                  @NotNull(message = "A data de fim das inscrições deve ser informada") LocalDate fimInscricoes,
+    public Edital(@NotBlank(message = "edital.semestre.nao.informado") @Pattern(regexp = "^\\d{4}\\.\\d$", message = "edital.semestre.formato") String semestre,
+                  @NotNull(message = "edital.data.inicio.nao.informado") LocalDate inicioInscricoes,
+                  @NotNull(message = "edital.data.fim.nao.informado") LocalDate fimInscricoes,
                   @NotNull(message = "Um edital deve ter sido cadastrado por um usuario") Usuario usuario) {
         this.semestre = semestre;
         this.inicioInscricoes = inicioInscricoes;

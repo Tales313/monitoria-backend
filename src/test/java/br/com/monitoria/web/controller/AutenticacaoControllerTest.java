@@ -5,6 +5,7 @@ import br.com.monitoria.domain.PerfilEnum;
 import br.com.monitoria.domain.Usuario;
 import br.com.monitoria.repository.PerfilRepository;
 import br.com.monitoria.repository.UsuarioRepository;
+import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class AutenticacaoControllerTest {
 
     private ResultActions enviarPost(LoginRequest request) throws Exception {
 
-        return mockMvc.perform(MockMvcRequestBuilders.post("/auth")
+        return mockMvc.perform(MockMvcRequestBuilders.post(Paths.AUTH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .accept(MediaType.APPLICATION_JSON));
@@ -106,9 +107,11 @@ class AutenticacaoControllerTest {
 
         enviarPost(loginRequest)
                 .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.status").value(HttpStatus.UNAUTHORIZED.value()))
                 .andExpect(jsonPath("$.error").value(HttpStatus.UNAUTHORIZED.getReasonPhrase()))
-                .andExpect(jsonPath("$.message").value("Login inexistente"));
+                .andExpect(jsonPath("$.message").value("Login inexistente"))
+                .andExpect(jsonPath("$.path").value(Paths.AUTH));
     }
 
     @Test
@@ -117,9 +120,11 @@ class AutenticacaoControllerTest {
 
         enviarPost(loginRequest)
                 .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.status").value(HttpStatus.UNAUTHORIZED.value()))
                 .andExpect(jsonPath("$.error").value(HttpStatus.UNAUTHORIZED.getReasonPhrase()))
-                .andExpect(jsonPath("$.message").value("Senha incorreta"));
+                .andExpect(jsonPath("$.message").value("Senha incorreta"))
+                .andExpect(jsonPath("$.path").value(Paths.AUTH));
     }
 
 }

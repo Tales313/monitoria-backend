@@ -54,7 +54,7 @@ public class InscricaoController {
         Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if(!usuario.getPerfilUnico().getNome().equals(PerfilEnum.ALUNO))
-            throw new OperacaoNegadaException("Apenas alunos podem se inscrever para concorrer a monitoria.");
+            throw new OperacaoNegadaException("inscricao.apenas.alunos");
 
         Vaga vaga = vagaRepository.findById(request.getIdVaga()).orElseThrow(
                 () -> new NotFoundException("Vaga não encontrada"));
@@ -74,7 +74,7 @@ public class InscricaoController {
         Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Edital edital = editalRepository.findTopByOrderByIdDesc().orElseThrow(
-                () -> new SemEditalAtivoException("Não há nenhum edital cadastrado"));
+                () -> new SemEditalAtivoException("edital.nenhum.cadastrado"));
 
         int qtdInscricoes = inscricaoRepository.
                 findByUsuarioIdAndVagaEditalId(usuario.getId(), edital.getId())

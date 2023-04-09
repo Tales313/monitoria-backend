@@ -51,7 +51,7 @@ public class VagaController {
     @GetMapping("/{id_edital}")
     public List<VagaResponse> buscarVagasPorEdital(@PathVariable("id_edital") Long id) {
         editalRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("Esse edital não existe"));
+                () -> new NotFoundException("edital.nao.encontrado"));
 
         List<Vaga> vagas = vagaRepository.findByEditalId(id);
 

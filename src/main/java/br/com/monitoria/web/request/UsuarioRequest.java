@@ -8,23 +8,23 @@ import java.time.LocalDate;
 
 public class UsuarioRequest {
 
-    @NotBlank(message = "O login não deve estar em branco")
-    @Email
-    @ValorUnico(classe = Usuario.class, nomeDoCampo = "login", message = "Já existe um usuário com este email")
+    @NotBlank(message = "usuario.login.branco")
+    @Email(message = "usuario.email.invalido")
+    @ValorUnico(classe = Usuario.class, nomeDoCampo = "login", message = "usuario.email.ja.existe")
     private String login;
 
-    @NotBlank(message = "O nome não deve estar em branco")
+    @NotBlank(message = "usuario.nome.branco")
     private String nome;
 
-    @NotNull(message = "A senha não deve ser nula")
-    @Size(min = 6, max = 20)
+    @NotNull(message = "usuario.senha.nao.informada")
+    @Size(min = 6, max = 20, message = "usuario.senha.tamanho")
     private String senha;
 
-    @NotBlank(message = "A matricula não deve estar em branco")
+    @NotBlank(message = "usuario.matricula.branco")
     private String matricula;
 
-    @NotNull(message = "A data de nascimento deve ser informada")
-    @Past(message = "A data de nascimento não pode ser no futuro")
+    @NotNull(message = "usuario.dataNascimento.nao.informada")
+    @Past(message = "usuario.dataNascimento.futuro")
     private LocalDate dataNascimento;
 
     public UsuarioRequest(String login, String nome, String senha, String matricula, LocalDate dataNascimento) {

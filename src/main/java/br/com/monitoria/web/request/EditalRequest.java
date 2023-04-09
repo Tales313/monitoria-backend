@@ -9,14 +9,14 @@ import java.time.LocalDate;
 
 public class EditalRequest {
 
-    @NotNull(message = "O semestre deve ser informado")
-    @Pattern(regexp = "^\\d{4}\\.\\d$", message = "O semestre deve ter o formato '2022.1'")
+    @NotNull(message = "edital.semestre.nao.informado")
+    @Pattern(regexp = "^\\d{4}\\.\\d$", message = "edital.semestre.formato")
     private String semestre;
 
-    @NotNull(message = "A data de inicio das incrições deve ser informada")
+    @NotNull(message = "edital.data.inicio.nao.informado")
     private LocalDate inicioInscricoes;
 
-    @NotNull(message = "A data de fim das inscrições deve ser informada")
+    @NotNull(message = "edital.data.fim.nao.informado")
     private LocalDate fimInscricoes;
 
     public EditalRequest(String semestre, LocalDate inicioInscricoes, LocalDate fimInscricoes) {

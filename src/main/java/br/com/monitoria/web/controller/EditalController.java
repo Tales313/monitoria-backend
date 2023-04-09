@@ -48,16 +48,16 @@ public class EditalController {
     public EditalResponse buscarEdital(@PathVariable Long id) {
 
         Edital edital = editalRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("Edital não encontrado"));
+                () -> new NotFoundException("edital.nao.encontrado"));
 
         return new EditalResponse(edital);
 
     }
 
-    @GetMapping("/ativo")
+    @GetMapping(Paths.ATIVO)
     public EditalResponse buscarEditalAtivo() {
         Edital edital = editalRepository.findTopByOrderByIdDesc().orElseThrow(
-                () -> new SemEditalAtivoException("Não há nenhum edital cadastrado"));
+                () -> new SemEditalAtivoException("edital.nenhum.cadastrado"));
 
         return new EditalResponse(edital);
     }
