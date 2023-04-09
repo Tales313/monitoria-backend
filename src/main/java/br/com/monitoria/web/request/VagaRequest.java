@@ -12,17 +12,17 @@ import javax.validation.constraints.Positive;
 
 public class VagaRequest {
 
-    @NotBlank(message = "A disciplina deve ser informada")
+    @NotBlank(message = "vaga.disciplina.nao.informada")
     private String disciplina;
 
-    @NotBlank(message = "O periodo deve ser informado")
+    @NotBlank(message = "vaga.periodo.nao.informado")
     private String periodo;
 
-    @NotNull(message = "A quantidade deve ser informada")
-    @Positive(message = "A quantidade deve ter valor positivo")
+    @NotNull(message = "vaga.quantidade.nao.informada")
+    @Positive(message = "vaga.quantidade.negativa")
     private Integer quantidade;
 
-    @NotNull(message = "O id do edital deve ser informado")
+    @NotNull(message = "vaga.idEdital.nao.informado")
     private Long editalId;
 
     public VagaRequest(String disciplina, String periodo, Integer quantidade, Long editalId) {
@@ -34,7 +34,7 @@ public class VagaRequest {
 
     public Vaga toModel(EditalRepository editalRepository, Usuario usuario) {
         Edital edital = editalRepository.findById(editalId).orElseThrow(
-                () -> new NotFoundException("Edital não encontrado"));
+                () -> new NotFoundException("edital.nao.encontrado"));
         return new Vaga(disciplina, periodo, quantidade, edital, usuario);
     }
 

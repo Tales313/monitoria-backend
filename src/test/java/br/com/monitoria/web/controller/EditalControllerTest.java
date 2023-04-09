@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -50,6 +52,9 @@ class EditalControllerTest {
 
     private Usuario usuario;
 
+    @Autowired
+    private MessageSource messageSource;
+
     public EditalControllerTest() {
         this.objectMapper = new ObjectMapper();
 
@@ -64,6 +69,10 @@ class EditalControllerTest {
         this.usuario = usuarioRepository.findByLogin("admin@gmail.com").get();
     }
 
+    private String getMessageSource(String defaultMessage) {
+        return messageSource.getMessage(defaultMessage, null, defaultMessage, LocaleContextHolder.getLocale());
+    }
+
     private ResultActions enviarPost(EditalRequest request) throws Exception {
 
         return mockMvc.perform(MockMvcRequestBuilders.post(Paths.EDITAIS)
@@ -76,12 +85,14 @@ class EditalControllerTest {
     private void enviarPostEValidarRespostaDeErro(EditalRequest request, String mensagemDeErro, HttpStatus httpStatus) throws Exception {
         enviarPost(request)
                 .andExpect(status().is(httpStatus.value()))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.status").value(httpStatus.value()))
                 .andExpect(jsonPath("$.error").value(httpStatus.getReasonPhrase()))
-                .andExpect(jsonPath("$.message").value(mensagemDeErro));
+                .andExpect(jsonPath("$.message").value(mensagemDeErro))
+                .andExpect(jsonPath("$.path").value(Paths.EDITAIS));
     }
 
-    private ResultActions enviarGet(Long id) throws Exception {
+    private ResultActions enviarGetById(Long id) throws Exception {
 
         return mockMvc.perform(MockMvcRequestBuilders.get(Paths.EDITAIS + "/" + id)
                 .header("Authorization", "Bearer " + token)
@@ -90,7 +101,7 @@ class EditalControllerTest {
 
     private ResultActions enviarGetEditalAtivo() throws Exception {
 
-        return mockMvc.perform(MockMvcRequestBuilders.get(Paths.EDITAIS + "/ativo")
+        return mockMvc.perform(MockMvcRequestBuilders.get(Paths.EDITAIS + Paths.ATIVO)
                 .header("Authorization", "Bearer " + token)
                 .accept(MediaType.APPLICATION_JSON));
     }
@@ -124,7 +135,7 @@ class EditalControllerTest {
     void badRequestAoCriarEditalComSemestreNulo() throws Exception {
         EditalRequest editalRequest = new EditalRequest(null, LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
 
-        enviarPostEValidarRespostaDeErro(editalRequest, "O semestre deve ser informado", HttpStatus.BAD_REQUEST);
+        enviarPostEValidarRespostaDeErro(editalRequest, getMessageSource("edital.semestre.nao.informado"), HttpStatus.BAD_REQUEST);
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
@@ -134,7 +145,7 @@ class EditalControllerTest {
     void badRequestAoCriarEditalComSemestreEmBranco() throws Exception {
         EditalRequest editalRequest = new EditalRequest("", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
 
-        enviarPostEValidarRespostaDeErro(editalRequest, "O semestre deve ter o formato 2022.1", HttpStatus.BAD_REQUEST);
+        enviarPostEValidarRespostaDeErro(editalRequest, getMessageSource("edital.semestre.formato"), HttpStatus.BAD_REQUEST);
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
@@ -144,7 +155,7 @@ class EditalControllerTest {
     void badRequestAoCriarEditalComSemestreInvalido() throws Exception {
         EditalRequest editalRequest = new EditalRequest("123.4", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
 
-        enviarPostEValidarRespostaDeErro(editalRequest, "O semestre deve ter o formato 2022.1", HttpStatus.BAD_REQUEST);
+        enviarPostEValidarRespostaDeErro(editalRequest, getMessageSource("edital.semestre.formato"), HttpStatus.BAD_REQUEST);
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
@@ -154,7 +165,7 @@ class EditalControllerTest {
     void badRequestAoCriarEditalComInicioInscricoesNula() throws Exception {
         EditalRequest editalRequest = new EditalRequest("2022.1", null, LocalDate.of(2022, 7, 15));
 
-        enviarPostEValidarRespostaDeErro(editalRequest, "A data de inicio das incrições deve ser informada", HttpStatus.BAD_REQUEST);
+        enviarPostEValidarRespostaDeErro(editalRequest, getMessageSource("edital.data.inicio.nao.informado"), HttpStatus.BAD_REQUEST);
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
@@ -164,7 +175,7 @@ class EditalControllerTest {
     void badRequestAoCriarEditalComFimInscricoesNula() throws Exception {
         EditalRequest editalRequest = new EditalRequest("2022.1", LocalDate.of(2022, 7, 1), null);
 
-        enviarPostEValidarRespostaDeErro(editalRequest, "A data de fim das inscrições deve ser informada", HttpStatus.BAD_REQUEST);
+        enviarPostEValidarRespostaDeErro(editalRequest, getMessageSource("edital.data.fim.nao.informado"), HttpStatus.BAD_REQUEST);
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
@@ -185,7 +196,7 @@ class EditalControllerTest {
         this.token = autenticarComAluno(objectMapper, mockMvc);
 
         EditalRequest editalRequest = new EditalRequest("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15));
-        enviarPostEValidarRespostaDeErro(editalRequest, "Você não tem autorização para executar essa ação.", HttpStatus.FORBIDDEN);
+        enviarPostEValidarRespostaDeErro(editalRequest, getMessageSource("usuario.sem.autorizacao"), HttpStatus.FORBIDDEN);
 
         List<Edital> editais = editalRepository.findAll();
         assertTrue(editais.isEmpty());
@@ -196,7 +207,7 @@ class EditalControllerTest {
         Edital edital = new Edital("2022.2", LocalDate.of(2022, 7, 1), LocalDate.of(2022, 7, 15), usuario);
         edital = editalRepository.save(edital);
 
-        enviarGet(edital.getId())
+        enviarGetById(edital.getId())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(edital.getId()))
                 .andExpect(jsonPath("$.semestre").value(edital.getSemestre()))
@@ -207,10 +218,13 @@ class EditalControllerTest {
     @Test
     void badRequestAoBuscarEditalNaoExistente() throws Exception {
 
-        enviarGet(1L)
+        enviarGetById(1L)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Bad Request"))
-                .andExpect(jsonPath("$.message").value("Edital não encontrado"));
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.error").value(HttpStatus.BAD_REQUEST.getReasonPhrase()))
+                .andExpect(jsonPath("$.message").value(getMessageSource("edital.nao.encontrado")))
+                .andExpect(jsonPath("$.path").value(Paths.EDITAIS + "/1"));
     }
 
     @Test
@@ -230,8 +244,11 @@ class EditalControllerTest {
     void unprocessableEntityAoBuscarPeloEditalAtivoEEleNaoExiste() throws Exception {
         enviarGetEditalAtivo()
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.error").value("Unprocessable Entity"))
-                .andExpect(jsonPath("$.message").value("Não há nenhum edital cadastrado"));
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.status").value(HttpStatus.UNPROCESSABLE_ENTITY.value()))
+                .andExpect(jsonPath("$.error").value(HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase()))
+                .andExpect(jsonPath("$.message").value(getMessageSource("edital.nenhum.cadastrado")))
+                .andExpect(jsonPath("$.path").value(Paths.EDITAIS + Paths.ATIVO));
     }
 
 }

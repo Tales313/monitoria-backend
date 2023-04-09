@@ -9,19 +9,19 @@ import javax.validation.constraints.NotNull;
 
 public class InscricaoRequest {
 
-    @NotNull(message = "A opcao deve ser informada")
-    @Range(min = 1, max = 2, message = "A opcao deve ser 1 ou 2")
+    @NotNull(message = "inscricao.opcao.nao.informada")
+    @Range(min = 1, max = 2, message = "inscricao.opcao.range")
     private Integer opcao;
 
-    @NotNull(message = "A nota da disciplina deve ser informada")
-    @Range(min = 70, max = 100, message = "A nota da disciplina deve ser entre 70 e 100")
+    @NotNull(message = "inscricao.nota.nao.informada")
+    @Range(min = 70, max = 100, message = "inscricao.nota.range")
     private Double notaDisciplina;
 
-    @NotNull(message = "O CRE deve ser informado")
-    @Range(min = 0, max = 100, message = "O CRE deve ser entre 0 e 100")
+    @NotNull(message = "inscricao.cre.nao.informado")
+    @Range(min = 0, max = 100, message = "inscricao.cre.range")
     private Double cre;
 
-    @NotNull(message = "O id da vaga deve ser informado")
+    @NotNull(message = "inscricao.idVaga.nao.informado")
     private Long idVaga;
 
     public InscricaoRequest(Integer opcao, Double notaDisciplina, Double cre, Long idVaga) {

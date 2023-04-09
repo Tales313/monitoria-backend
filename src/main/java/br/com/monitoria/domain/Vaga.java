@@ -13,14 +13,14 @@ public class Vaga {
     @SequenceGenerator(name = "generator_vaga", sequenceName = "sequence_id_vaga", allocationSize = 1)
     private Long id;
 
-    @NotBlank(message = "A disciplina deve ser informada")
+    @NotBlank(message = "vaga.disciplina.nao.informada")
     private String disciplina;
 
-    @NotBlank(message = "O periodo deve ser informado")
+    @NotBlank(message = "vaga.periodo.nao.informado")
     private String periodo;
 
-    @NotNull(message = "A quantidade deve ser informada")
-    @Positive(message = "A quantidade deve ter valor positivo")
+    @NotNull(message = "vaga.quantidade.nao.informada")
+    @Positive(message = "vaga.quantidade.negativa")
     private Integer quantidade;
 
     private Boolean preenchida;
@@ -36,9 +36,9 @@ public class Vaga {
     public Vaga() {
     }
 
-    public Vaga(@NotBlank(message = "A disciplina deve ser informada") String disciplina,
-                @NotBlank(message = "O periodo deve ser informado") String periodo,
-                @NotNull(message = "A quantidade deve ser informada") @Positive(message = "A quantidade deve ter valor positivo") Integer quantidade,
+    public Vaga(@NotBlank(message = "vaga.disciplina.nao.informada") String disciplina,
+                @NotBlank(message = "vaga.periodo.nao.informado") String periodo,
+                @NotNull(message = "vaga.quantidade.nao.informada") @Positive(message = "vaga.quantidade.negativa") Integer quantidade,
                 @NotNull(message = "Uma vaga deve pertencer a um edital") Edital edital,
                 @NotNull(message = "Uma vaga deve ter sido cadastrado por um usuario") Usuario usuario) {
         this.disciplina = disciplina;

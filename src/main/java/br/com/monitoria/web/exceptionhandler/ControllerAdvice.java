@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestControllerAdvice
@@ -21,96 +22,74 @@ public class ControllerAdvice {
     @Autowired
     private MessageSource messageSource;
 
+    private String getMessageSource(String defaultMessage) {
+        return messageSource.getMessage(defaultMessage, null, defaultMessage, LocaleContextHolder.getLocale());
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorMessage handleException(Exception ex) {
-        return new ErrorMessage(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                ex.getMessage());
+    public ErrorResponse handleException(Exception ex, HttpServletRequest request) {
+        return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), request.getPathInfo());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessage handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
 
         String mensagem = "";
 
         List<FieldError> fieldErrorList = ex.getBindingResult().getFieldErrors();
 
-        for(FieldError fieldError : fieldErrorList)
-            mensagem = mensagem.concat(messageSource.getMessage(fieldError, LocaleContextHolder.getLocale())) + ";";
+        for(FieldError fieldError : fieldErrorList) {
+            mensagem = mensagem.concat(getMessageSource(fieldError.getDefaultMessage()) + ";");
+        }
 
         mensagem = mensagem.substring(0, mensagem.length()-1);
 
-        return new ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                mensagem);
+        return new ErrorResponse(HttpStatus.BAD_REQUEST, mensagem, request.getPathInfo());
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessage handleNotFoundException(NotFoundException ex) {
-        return new ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                ex.getMessage());
+    public ErrorResponse handleNotFoundException(NotFoundException ex, HttpServletRequest request) {
+        return new ErrorResponse(HttpStatus.BAD_REQUEST, getMessageSource(ex.getMessage()), request.getPathInfo());
     }
 
     @ExceptionHandler(DataInscricoesException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessage handleDataInscricoesException(DataInscricoesException ex) {
-        return new ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                ex.getMessage());
+    public ErrorResponse handleDataInscricoesException(DataInscricoesException ex, HttpServletRequest request) {
+        return new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getPathInfo());
     }
 
     @ExceptionHandler(OperacaoNegadaException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorMessage handleOperacaoNaoPermitidaException(OperacaoNegadaException ex) {
-        return new ErrorMessage(
-                HttpStatus.FORBIDDEN.value(),
-                HttpStatus.FORBIDDEN.getReasonPhrase(),
-                ex.getMessage());
+    public ErrorResponse handleOperacaoNaoPermitidaException(OperacaoNegadaException ex, HttpServletRequest request) {
+        return new ErrorResponse(HttpStatus.FORBIDDEN, getMessageSource(ex.getMessage()), request.getPathInfo());
     }
 
     @ExceptionHandler(InscricaoException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public ErrorMessage handleInscricaoException(InscricaoException ex) {
-        return new ErrorMessage(
-                HttpStatus.UNPROCESSABLE_ENTITY.value(),
-                HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase(),
-                ex.getMessage());
+    public ErrorResponse handleInscricaoException(InscricaoException ex, HttpServletRequest request) {
+        return new ErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY, getMessageSource(ex.getMessage()), request.getPathInfo());
     }
 
     @ExceptionHandler(InternalAuthenticationServiceException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorMessage handleInternalAuthenticationServiceException(InternalAuthenticationServiceException ex) {
-        return new ErrorMessage(
-                HttpStatus.UNAUTHORIZED.value(),
-                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
-                "Login inexistente");
+    public ErrorResponse handleInternalAuthenticationServiceException(InternalAuthenticationServiceException ex,
+                                                                      HttpServletRequest request) {
+        return new ErrorResponse(HttpStatus.UNAUTHORIZED, "Login inexistente", request.getPathInfo());
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorMessage handleBadCredentialsException(BadCredentialsException ex) {
-        return new ErrorMessage(
-                HttpStatus.UNAUTHORIZED.value(),
-                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
-                "Senha incorreta");
+    public ErrorResponse handleBadCredentialsException(BadCredentialsException ex, HttpServletRequest request) {
+        return new ErrorResponse(HttpStatus.UNAUTHORIZED, "Senha incorreta", request.getPathInfo());
     }
 
     @ExceptionHandler(SemEditalAtivoException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public ErrorMessage handleSemEditalAtivoException(SemEditalAtivoException ex) {
-        return new ErrorMessage(
-                HttpStatus.UNPROCESSABLE_ENTITY.value(),
-                HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase(),
-                ex.getMessage()
-        );
+    public ErrorResponse handleSemEditalAtivoException(SemEditalAtivoException ex, HttpServletRequest request) {
+        return new ErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY, getMessageSource(ex.getMessage()), request.getPathInfo());
     }
 
 }

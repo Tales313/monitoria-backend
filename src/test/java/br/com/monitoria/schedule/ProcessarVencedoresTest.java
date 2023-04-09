@@ -219,7 +219,6 @@ class ProcessarVencedoresTest {
     void testandoCenarioReal_Edital2020_2() {
         setUpCenarioReal();
 
-        //TODO
         processarVencedores.processar();
 
         assertEquals(8, vagaRepository.count());

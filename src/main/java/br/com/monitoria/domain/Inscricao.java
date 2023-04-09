@@ -17,43 +17,43 @@ public class Inscricao {
 
     private LocalDate dataInscricao;
 
-    @NotNull(message = "A opcao deve ser informada")
-    @Range(min = 1, max = 2, message = "A opcao deve ser 1 ou 2")
+    @NotNull(message = "inscricao.opcao.nao.informada")
+    @Range(min = 1, max = 2, message = "inscricao.opcao.range")
     private Integer opcao;
 
-    @NotNull(message = "A nota da disciplina deve ser informada")
-    @Range(min = 70, max = 100, message = "A nota da disciplina deve ser entre 70 e 100")
+    @NotNull(message = "inscricao.nota.nao.informada")
+    @Range(min = 70, max = 100, message = "inscricao.nota.range")
     private Double notaDisciplina;
 
-    @NotNull(message = "O CRE deve ser informado")
-    @Range(min = 0, max = 100, message = "O CRE deve ser entre 0 e 100")
+    @NotNull(message = "inscricao.cre.nao.informado")
+    @Range(min = 0, max = 100, message = "inscricao.cre.range")
     private Double cre;
 
-    @NotNull(message = "A média deve ser informada")
-    @Positive(message = "A média deve ter valor positivo")
+    @NotNull(message = "inscricao.media.nao.informada")
+    @Positive(message = "inscricao.media.negativa")
     private Double media;
 
-    @NotNull(message = "O resultado deve ser informado")
+    @NotNull(message = "inscricao.resultado.nao.informado")
     @Enumerated(EnumType.STRING)
     private ResultadoEnum resultado;
 
-    @NotNull(message = "Uma inscrição deve ter uma vaga")
+    @NotNull(message = "inscricao.vaga.nao.informada")
     @ManyToOne
     private Vaga vaga;
 
-    @NotNull(message = "Uma inscrição pertence a um usuario")
+    @NotNull(message = "inscricao.usuario.nao.informado")
     @ManyToOne
     private Usuario usuario;
 
     public Inscricao() {
     }
 
-    public Inscricao(@NotNull(message = "A opcao deve ser informada") @Range(min = 1, max = 2, message = "A opcao deve ser 1 ou 2") Integer opcao,
-                     @NotNull(message = "A nota da disciplina deve ser informada") @Positive(message = "A nota da disciplina deve ser entre 70 e 100") Double notaDisciplina,
-                     @NotNull(message = "O CRE deve ser informado") @Range(min = 0, max = 100, message = "O CRE deve ser entre 0 e 100") Double cre,
-                     @NotNull(message = "A média deve ser informada") @Positive(message = "A média deve ter valor positivo") Double media,
-                     @NotNull(message = "Uma inscrição deve ter uma vaga") Vaga vaga,
-                     @NotNull(message = "Uma inscrição pertence a um usuario") Usuario usuario) {
+    public Inscricao(@NotNull(message = "inscricao.opcao.nao.informada") @Range(min = 1, max = 2, message = "inscricao.opcao.range") Integer opcao,
+                     @NotNull(message = "inscricao.nota.nao.informada") @Positive(message = "inscricao.nota.range") Double notaDisciplina,
+                     @NotNull(message = "inscricao.cre.nao.informado") @Range(min = 0, max = 100, message = "inscricao.cre.range") Double cre,
+                     @NotNull(message = "inscricao.media.nao.informada") @Positive(message = "inscricao.media.negativa") Double media,
+                     @NotNull(message = "inscricao.vaga.nao.informada") Vaga vaga,
+                     @NotNull(message = "inscricao.usuario.nao.informado") Usuario usuario) {
         this.dataInscricao = LocalDate.now();
         this.opcao = opcao;
         this.notaDisciplina = notaDisciplina;

@@ -39,16 +39,16 @@ public class InscricaoService {
         LocalDate hoje = LocalDate.now();
 
         if(edital.getInicioInscricoes().isAfter(hoje))
-            throw new InscricaoException("O edital " + edital.getSemestre() + " ainda não está aberto");
+            throw new InscricaoException("inscricao.edital.ainda.fechado");
 
         if(edital.getFimInscricoes().isBefore(hoje))
-            throw new InscricaoException("O edital " + edital.getSemestre() + " já está fechado");
+            throw new InscricaoException("inscricao.edital.ja.fechado");
 
         List<Inscricao> inscricoesDoAlunoNessaVaga = inscricaoRepository.
                 findByUsuarioIdAndVagaId(usuario.getId(), vaga.getId());
 
         if(! inscricoesDoAlunoNessaVaga.isEmpty())
-            throw new InscricaoException("Aluno já inscrito nessa vaga");
+            throw new InscricaoException("inscricao.aluno.ja.inscrito");
 
         List<Inscricao> inscricoesDoAlunoNesseEdital = inscricaoRepository.
                 findByUsuarioIdAndVagaEditalId(usuario.getId(), edital.getId());
@@ -56,13 +56,13 @@ public class InscricaoService {
         if(! inscricoesDoAlunoNesseEdital.isEmpty()) {
 
             if(inscricoesDoAlunoNesseEdital.size() == 1 && inscricaoRequest.getOpcao() == 1)
-                throw new InscricaoException("Sua segunda inscrição deve ser a opção 2");
+                throw new InscricaoException("inscricao.segunda.opcao");
             else if (inscricoesDoAlunoNesseEdital.size() == 2)
-                throw new InscricaoException("Você não pode ter mais que duas inscrições");
+                throw new InscricaoException("inscricao.duas.opcoes");
 
         } else {
             if(inscricaoRequest.getOpcao() == 2)
-                throw new InscricaoException("Sua primeira inscrição deve ser a opção 1");
+                throw new InscricaoException("inscricao.primeira.opcao");
         }
     }
 
