@@ -9,6 +9,8 @@ import br.com.monitoria.service.HashService;
 import br.com.monitoria.util.Paths;
 import br.com.monitoria.web.request.UsuarioRequest;
 import br.com.monitoria.web.response.UsuarioResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +26,8 @@ public class UsuarioController {
 
     private HashService hashService;
 
+    private Logger log = LoggerFactory.getLogger(UsuarioController.class);
+
     public UsuarioController(
         UsuarioRepository usuarioRepository,
         PerfilRepository perfilRepository,
@@ -37,6 +41,8 @@ public class UsuarioController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UsuarioResponse cadastrarUsuario(@RequestBody @Valid UsuarioRequest request) {
+        log.info("Inicio do cadastro do usuário: {}", request);
+
         String senha = hashService.hash(request.getSenha());
         Perfil perfilAluno = perfilRepository.findByNome(PerfilEnum.ALUNO).get();
         Usuario usuario = new Usuario(request.getLogin(), request.getNome(), senha, request.getMatricula(), request.getDataNascimento(), perfilAluno);
@@ -44,6 +50,9 @@ public class UsuarioController {
         // É necessario setar o relacionamento dos dois lados, isso garante que a tabela
         // intermediaria do ManyToMany seja alimentada
         usuarioRepository.save(usuario);
+
+        log.info("Usuário cadastrado");
+
         return new UsuarioResponse(usuario.getLogin(), usuario.getMatricula(), usuario.getDataNascimento());
     }
 

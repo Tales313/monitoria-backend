@@ -1,6 +1,8 @@
 package br.com.monitoria.web.exceptionhandler;
 
 import br.com.monitoria.exception.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -22,6 +24,8 @@ public class ControllerAdvice {
     @Autowired
     private MessageSource messageSource;
 
+    private Logger log = LoggerFactory.getLogger(ControllerAdvice.class);
+
     private String getMessageSource(String defaultMessage) {
         return messageSource.getMessage(defaultMessage, null, defaultMessage, LocaleContextHolder.getLocale());
     }
@@ -29,7 +33,9 @@ public class ControllerAdvice {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception ex, HttpServletRequest request) {
-        return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), request.getPathInfo());
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        log.error(status.getReasonPhrase() + ": {}", ex.getMessage());
+        return new ErrorResponse(status, ex.getMessage(), request.getPathInfo());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -46,30 +52,40 @@ public class ControllerAdvice {
 
         mensagem = mensagem.substring(0, mensagem.length()-1);
 
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error(status.getReasonPhrase() + ": {}", mensagem);
         return new ErrorResponse(HttpStatus.BAD_REQUEST, mensagem, request.getPathInfo());
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleNotFoundException(NotFoundException ex, HttpServletRequest request) {
-        return new ErrorResponse(HttpStatus.BAD_REQUEST, getMessageSource(ex.getMessage()), request.getPathInfo());
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error(status.getReasonPhrase() + ": {}", ex.getMessage());
+        return new ErrorResponse(status, getMessageSource(ex.getMessage()), request.getPathInfo());
     }
 
     @ExceptionHandler(DataInscricoesException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDataInscricoesException(DataInscricoesException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error(status.getReasonPhrase() + ": {}", ex.getMessage());
         return new ErrorResponse(HttpStatus.BAD_REQUEST, getMessageSource(ex.getMessage()), request.getPathInfo());
     }
 
     @ExceptionHandler(OperacaoNegadaException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleOperacaoNaoPermitidaException(OperacaoNegadaException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        log.error(status.getReasonPhrase() + ": {}", ex.getMessage());
         return new ErrorResponse(HttpStatus.FORBIDDEN, getMessageSource(ex.getMessage()), request.getPathInfo());
     }
 
     @ExceptionHandler(InscricaoException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ErrorResponse handleInscricaoException(InscricaoException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+        log.error(status.getReasonPhrase() + ": {}", ex.getMessage());
         return new ErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY, getMessageSource(ex.getMessage()), request.getPathInfo());
     }
 
@@ -77,18 +93,24 @@ public class ControllerAdvice {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleInternalAuthenticationServiceException(InternalAuthenticationServiceException ex,
                                                                       HttpServletRequest request) {
-        return new ErrorResponse(HttpStatus.UNAUTHORIZED, "Login inexistente", request.getPathInfo());
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        log.error(status.getReasonPhrase() + ": {}", ex.getMessage());
+        return new ErrorResponse(status, getMessageSource("usuario.login.inexistente"), request.getPathInfo());
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleBadCredentialsException(BadCredentialsException ex, HttpServletRequest request) {
-        return new ErrorResponse(HttpStatus.UNAUTHORIZED, "Senha incorreta", request.getPathInfo());
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        log.error(status.getReasonPhrase() + ": {}", ex.getMessage());
+        return new ErrorResponse(HttpStatus.UNAUTHORIZED, getMessageSource("usuario.senha.incorreta"), request.getPathInfo());
     }
 
     @ExceptionHandler(SemEditalAtivoException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ErrorResponse handleSemEditalAtivoException(SemEditalAtivoException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+        log.error(status.getReasonPhrase() + ": {}", ex.getMessage());
         return new ErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY, getMessageSource(ex.getMessage()), request.getPathInfo());
     }
 
