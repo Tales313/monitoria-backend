@@ -1,3 +1,24 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/monitoria}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:123}
+
+jwt:
+  expiration: ${JWT_EXPIRATION:86400000}  # 86400000 = 24 horas
+  secret: ${JWT_SECRET:jwt-dev-secret}
+
+allowed-origin:
+  url: 'http://localhost:3000'
+
 application:
   api-info:
     titulo: '@project.name@'
