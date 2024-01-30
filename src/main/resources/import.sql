@@ -6,7 +6,7 @@ INSERT INTO PERFIL VALUES ((SELECT NEXTVAL('SEQUENCE_ID_PERFIL')), 'ALUNO');
 --
 -- Senha: 123456
 -- $2a$10$F/f76piJUaBdGsDlJ9dHD.yyxOUSWMY/bYob3Kwqx9whgIJ3hP1pu
--- Hasheada com BCrypt. Secret está no application-dev.yml
+-- Hasheada com BCrypt. Secret dev está no application.yml
 --
 --
 -- Inserindo usuario admin do sistema
