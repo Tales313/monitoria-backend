@@ -12,5 +12,5 @@ db_url="jdbc:postgresql://$db_host:$db_port/$db_name"
 
 # Exportar a variável de ambiente
 export DB_URL="$db_url"
-export DB_USERNAME$(aws secretsmanager get-secret-value --secret-id homolog/db_monitoria --query SecretString --output text | jq -r .username)
-export DB_PASSWORD$(aws secretsmanager get-secret-value --secret-id homolog/db_monitoria --query SecretString --output text | jq -r .password)
+export DB_USERNAME=$(aws secretsmanager get-secret-value --secret-id homolog/db_monitoria --query SecretString --output text | jq -r .username)
+export DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id homolog/db_monitoria --query SecretString --output text | jq -r .password)
